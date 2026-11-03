@@ -62,7 +62,13 @@ function renderSummary(){
   const hayGente=Object.keys(counts).length>0; $("r-nolista").hidden=true; $("r-perstit").hidden=!hayGente; $("r-wrap").hidden=!hayGente;   // solo si hay alguien en alguna lista   // sin listas por persona: esta parte no sale
   Object.keys(counts).sort((a,b)=>counts[b]-counts[a]||nm(a).localeCompare(nm(b),"es")).forEach(k=>{ const tr=document.createElement("tr"); tr.innerHTML=`<td>${esc(nm(k))}</td><td class="n">${counts[k]} de ${conLista.length}</td>`; tb.append(tr); });
   $("r-tablenote").textContent="";   // sin notas: la tabla habla sola
-  const months=Object.keys(data.pagos).filter(inCtxMonth).sort(); // de más antiguo a más reciente
+  const mesHoy=todayISO().slice(0,7);
+  const months=Object.keys(data.pagos).filter(m=>inCtxMonth(m)&&m<=mesHoy).sort(); // hasta el mes en curso, de más antiguo a más reciente
+  // Meses futuros ya pagados (por adelantado): no van en la gráfica ni en la tabla, solo en una línea aparte
+  const futuros=Object.keys(data.pagos).filter(m=>inCtxMonth(m)&&m>mesHoy).sort(); const porPersona={};
+  futuros.forEach(m=>Object.entries(data.pagos[m].rows||{}).forEach(([pid,x])=>{ (porPersona[pid]=porPersona[pid]||{ms:[],t:0}).ms.push(m); porPersona[pid].t+=Number(x.amount)||0; }));
+  const adel=Object.entries(porPersona).map(([pid,v])=>`${esc((data.persons[pid]||{name:pid}).name)}, de ${monthName(v.ms[0])} a ${monthName(v.ms[v.ms.length-1])} (${v.t} €)`);
+  $("r-adelantado").hidden=!adel.length; $("r-adelantado").innerHTML=adel.length?`<b>Ya pagado por adelantado</b> · ${adel.join(" · ")}`:"";
   const tp=$("r-pagos").querySelector("tbody"); tp.innerHTML="";
   const mi=months.map(m=>{ const rows=data.pagos[m].rows||{}; const t=Object.values(rows).reduce((a,x)=>a+(x.amount||0),0); const tr=document.createElement("tr"); tr.innerHTML=`<td>${monthName(m)}</td><td class="n">${Object.keys(rows).length}</td><td class="n">${t} €</td>`; tp.append(tr); return {label:shortMonth(m),short:MESES[+m.slice(5,7)-1].slice(0,3),value:t}; });
   bars($("r-chart-pag"), mi, v=>v+" €");

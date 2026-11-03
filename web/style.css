@@ -248,3 +248,6 @@ footer .note,#ver{color:rgba(255,255,255,.8)}
 .loli-pend .lp-num{font:700 1.9rem var(--title);color:var(--bad)}
 .loli-pend.cero .lp-num{color:var(--fg)}
 .loli-pend .lp-det{font-size:.88rem;color:var(--muted)}
+
+.adelantado{margin:10px 0 0;font-size:.95rem;color:var(--fg)}
+.adelantado b{font-weight:600}

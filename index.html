@@ -263,6 +263,9 @@ footer .note,#ver{color:rgba(255,255,255,.8)}
 .loli-pend .lp-num{font:700 1.9rem var(--title);color:var(--bad)}
 .loli-pend.cero .lp-num{color:var(--fg)}
 .loli-pend .lp-det{font-size:.88rem;color:var(--muted)}
+
+.adelantado{margin:10px 0 0;font-size:.95rem;color:var(--fg)}
+.adelantado b{font-weight:600}
 </style>
 </head>
 <body>
@@ -377,6 +380,7 @@ footer .note,#ver{color:rgba(255,255,255,.8)}
       <h2>Cuotas por mes</h2>
       <div class="chart" id="r-chart-pag"></div>
       <div class="scroll"><table id="r-pagos"><thead><tr><th>Mes</th><th class="n">Personas</th><th class="n">Total</th></tr></thead><tbody></tbody></table></div>
+      <p class="adelantado" id="r-adelantado" hidden></p>
     </div>
     <div class="card">
       <h2>Exportar</h2>
@@ -566,7 +570,7 @@ async function pickStore(){
 
 (function(){
 // ===== 1. BASE: utilidades, temporadas, navegación, botón Guardar =====
-const APP_VERSION = "03/11 02:00:23";
+const APP_VERSION = "03/11 02:01:37";
 const SOCIA_AMOUNT = 20;            // alta del Casal de la Dona (pago único, va íntegro a Loli)
 const DEFAULT_AMOUNT = 40;          // cuota mensual de Moviment Creatiu
 const $ = id => document.getElementById(id);
@@ -1246,7 +1250,13 @@ function renderSummary(){
   const hayGente=Object.keys(counts).length>0; $("r-nolista").hidden=true; $("r-perstit").hidden=!hayGente; $("r-wrap").hidden=!hayGente;   // solo si hay alguien en alguna lista   // sin listas por persona: esta parte no sale
   Object.keys(counts).sort((a,b)=>counts[b]-counts[a]||nm(a).localeCompare(nm(b),"es")).forEach(k=>{ const tr=document.createElement("tr"); tr.innerHTML=`<td>${esc(nm(k))}</td><td class="n">${counts[k]} de ${conLista.length}</td>`; tb.append(tr); });
   $("r-tablenote").textContent="";   // sin notas: la tabla habla sola
-  const months=Object.keys(data.pagos).filter(inCtxMonth).sort(); // de más antiguo a más reciente
+  const mesHoy=todayISO().slice(0,7);
+  const months=Object.keys(data.pagos).filter(m=>inCtxMonth(m)&&m<=mesHoy).sort(); // hasta el mes en curso, de más antiguo a más reciente
+  // Meses futuros ya pagados (por adelantado): no van en la gráfica ni en la tabla, solo en una línea aparte
+  const futuros=Object.keys(data.pagos).filter(m=>inCtxMonth(m)&&m>mesHoy).sort(); const porPersona={};
+  futuros.forEach(m=>Object.entries(data.pagos[m].rows||{}).forEach(([pid,x])=>{ (porPersona[pid]=porPersona[pid]||{ms:[],t:0}).ms.push(m); porPersona[pid].t+=Number(x.amount)||0; }));
+  const adel=Object.entries(porPersona).map(([pid,v])=>`${esc((data.persons[pid]||{name:pid}).name)}, de ${monthName(v.ms[0])} a ${monthName(v.ms[v.ms.length-1])} (${v.t} €)`);
+  $("r-adelantado").hidden=!adel.length; $("r-adelantado").innerHTML=adel.length?`<b>Ya pagado por adelantado</b> · ${adel.join(" · ")}`:"";
   const tp=$("r-pagos").querySelector("tbody"); tp.innerHTML="";
   const mi=months.map(m=>{ const rows=data.pagos[m].rows||{}; const t=Object.values(rows).reduce((a,x)=>a+(x.amount||0),0); const tr=document.createElement("tr"); tr.innerHTML=`<td>${monthName(m)}</td><td class="n">${Object.keys(rows).length}</td><td class="n">${t} €</td>`; tp.append(tr); return {label:shortMonth(m),short:MESES[+m.slice(5,7)-1].slice(0,3),value:t}; });
   bars($("r-chart-pag"), mi, v=>v+" €");
