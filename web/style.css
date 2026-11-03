@@ -148,6 +148,7 @@ footer{display:flex;justify-content:flex-end;color:var(--line);font-size:.65rem;
 .chart .bar{fill:var(--fg)}
 .chart text{font-family:var(--body);fill:var(--muted);font-size:11px}
 .chart text.v{fill:var(--fg);font-weight:600}
+.chart svg.apretada text{font-size:9.5px}
 .chart line{stroke:var(--line)}
 textarea{font:inherit;font-size:.85rem;width:100%;min-height:140px;background:var(--soft);color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:10px}
 .banner{background:var(--soft);border-radius:10px;padding:10px 12px;font-size:.9rem}
@@ -226,9 +227,11 @@ header.mc>div,header.mc>p{padding:0}
   -webkit-mask-image:linear-gradient(to bottom,transparent,#000 10%,#000 62%,transparent 100%),linear-gradient(to right,transparent,#000 9%,#000 91%,transparent);-webkit-mask-composite:source-in;mask-image:linear-gradient(to bottom,transparent,#000 10%,#000 62%,transparent 100%),linear-gradient(to right,transparent,#000 9%,#000 91%,transparent);mask-composite:intersect}
 h1.mc-title{position:relative;margin:-24% 0 0;padding-left:6%;font:300 clamp(2.4rem,12.5vw,4rem)/.92 var(--title);letter-spacing:-.01em;text-transform:uppercase;color:#fff;text-align:left;text-wrap:balance}
 h1.mc-title b{font-weight:700;display:inline}
-.mc-sub{color:rgba(255,255,255,.92);text-align:left;padding-left:6% !important;margin:10px 0 0;font-size:.92rem}
-.mc-sub span{white-space:normal}
-.lf{color:rgba(255,255,255,.9);margin:6px 0 4px}
+.mc-sub{color:#fff;text-align:left;padding-left:6% !important;margin:14px 0 0;font:400 clamp(.98rem,4.3vw,1.3rem)/1.4 var(--title);letter-spacing:.01em;text-shadow:0 1px 10px rgba(80,20,8,.35)}
+.mc-sub>span{display:block;white-space:nowrap}
+.mc-sub #h-season{white-space:nowrap}
+.lf{color:#fff;margin:8px 0 4px;font-size:clamp(.7rem,2.95vw,.95rem);white-space:nowrap;text-shadow:0 1px 8px rgba(80,20,8,.3)}
+.lf span{text-align:right}
 footer .note,#ver{color:rgba(255,255,255,.8)}
 .card{border-color:transparent;box-shadow:0 1px 0 rgba(0,0,0,.04)}
 /* Loli */

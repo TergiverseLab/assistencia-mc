@@ -163,6 +163,7 @@ footer{display:flex;justify-content:flex-end;color:var(--line);font-size:.65rem;
 .chart .bar{fill:var(--fg)}
 .chart text{font-family:var(--body);fill:var(--muted);font-size:11px}
 .chart text.v{fill:var(--fg);font-weight:600}
+.chart svg.apretada text{font-size:9.5px}
 .chart line{stroke:var(--line)}
 textarea{font:inherit;font-size:.85rem;width:100%;min-height:140px;background:var(--soft);color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:10px}
 .banner{background:var(--soft);border-radius:10px;padding:10px 12px;font-size:.9rem}
@@ -241,9 +242,11 @@ header.mc>div,header.mc>p{padding:0}
   -webkit-mask-image:linear-gradient(to bottom,transparent,#000 10%,#000 62%,transparent 100%),linear-gradient(to right,transparent,#000 9%,#000 91%,transparent);-webkit-mask-composite:source-in;mask-image:linear-gradient(to bottom,transparent,#000 10%,#000 62%,transparent 100%),linear-gradient(to right,transparent,#000 9%,#000 91%,transparent);mask-composite:intersect}
 h1.mc-title{position:relative;margin:-24% 0 0;padding-left:6%;font:300 clamp(2.4rem,12.5vw,4rem)/.92 var(--title);letter-spacing:-.01em;text-transform:uppercase;color:#fff;text-align:left;text-wrap:balance}
 h1.mc-title b{font-weight:700;display:inline}
-.mc-sub{color:rgba(255,255,255,.92);text-align:left;padding-left:6% !important;margin:10px 0 0;font-size:.92rem}
-.mc-sub span{white-space:normal}
-.lf{color:rgba(255,255,255,.9);margin:6px 0 4px}
+.mc-sub{color:#fff;text-align:left;padding-left:6% !important;margin:14px 0 0;font:400 clamp(.98rem,4.3vw,1.3rem)/1.4 var(--title);letter-spacing:.01em;text-shadow:0 1px 10px rgba(80,20,8,.35)}
+.mc-sub>span{display:block;white-space:nowrap}
+.mc-sub #h-season{white-space:nowrap}
+.lf{color:#fff;margin:8px 0 4px;font-size:clamp(.7rem,2.95vw,.95rem);white-space:nowrap;text-shadow:0 1px 8px rgba(80,20,8,.3)}
+.lf span{text-align:right}
 footer .note,#ver{color:rgba(255,255,255,.8)}
 .card{border-color:transparent;box-shadow:0 1px 0 rgba(0,0,0,.04)}
 /* Loli */
@@ -268,7 +271,7 @@ footer .note,#ver{color:rgba(255,255,255,.8)}
     <div class="mc-words" aria-hidden="true"><span>cos</span><span>performance</span><span>presència</span></div>
     <div class="mc-img" role="img" aria-label="Taller de Moviment Creatiu"></div>
     <h1 class="mc-title">Taller de <b>Moviment</b> Creatiu</h1>
-    <p class="sub mc-sub">Assistència i quotes · <span id="h-season">Temporada</span> · <span>Casal de la Dona · Palafolls</span></p>
+    <p class="sub mc-sub"><span>Assistència i quotes · <span id="h-season">Temporada</span></span><span>Casal de la Dona · Palafolls</span></p>
   </header>
   <div class="lf"><span>Un projecte de l'Associació Laboratori Línia de Fuga</span><div class="logo-lf" role="img" aria-label="Línia de Fuga"></div></div>
 
@@ -563,7 +566,7 @@ async function pickStore(){
 
 (function(){
 // ===== 1. BASE: utilidades, temporadas, navegación, botón Guardar =====
-const APP_VERSION = "03/11 01:55:55";
+const APP_VERSION = "03/11 02:00:23";
 const SOCIA_AMOUNT = 20;            // alta del Casal de la Dona (pago único, va íntegro a Loli)
 const DEFAULT_AMOUNT = 40;          // cuota mensual de Moviment Creatiu
 const $ = id => document.getElementById(id);
@@ -1180,17 +1183,20 @@ function pintarFicha(f){
 }
 
 // ===== 5. RESUMEN y filtros de temporada/grupo =====
-function bars(el, items, fmtV){ // items: [{label, value}], una sola serie, barras verticales
+function bars(el, items, fmtV){ // items: [{label, value, short?}], una sola serie, barras verticales
   if(!items.length){ el.innerHTML=""; return; }
   const W=360,H=150,top=22,bottom=28,left=6,right=6; const n=items.length;
   const max=Math.max(...items.map(i=>i.value),1); const bw=Math.min(40,(W-left-right)/n-4); const step=(W-left-right)/n;
-  const y=v=>top+(H-top-bottom)*(1-v/max); const every=Math.ceil(n/6);
-  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Gráfica">`;
+  const y=v=>top+(H-top-bottom)*(1-v/max);
+  // Hasta 12 barras: cada una con su cifra y su etiqueta. Con más, las cifras solo en la más alta y en la última,
+  // y las etiquetas repartidas; nunca se queda sin cifra la barra más alta.
+  const todas=n<=12, apretado=n>8, every=Math.ceil(n/8), iMax=items.findIndex(i=>i.value===max);
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Gráfica"${apretado?' class="apretada"':""}>`;
   s+=`<line x1="${left}" x2="${W-right}" y1="${H-bottom}" y2="${H-bottom}"/>`;
-  items.forEach((it,i)=>{ const x=left+step*i+(step-bw)/2; const yy=y(it.value); const h=H-bottom-yy;
+  items.forEach((it,i)=>{ const x=left+step*i+(step-bw)/2; const yy=y(it.value); const h=H-bottom-yy; const cx=(x+bw/2).toFixed(1);
     s+=`<rect class="bar" x="${x.toFixed(1)}" y="${yy.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(h,0).toFixed(1)}" rx="3"><title>${esc(it.label)}: ${esc(fmtV(it.value))}</title></rect>`;
-    if(n<=8 || i%every===0 || i===n-1) s+=`<text class="v" x="${(x+bw/2).toFixed(1)}" y="${(yy-5).toFixed(1)}" text-anchor="middle">${esc(fmtV(it.value))}</text>`;
-    if(n<=8 || i%every===0 || i===n-1) s+=`<text x="${(x+bw/2).toFixed(1)}" y="${H-bottom+16}" text-anchor="middle">${esc(it.label)}</text>`;
+    if(todas || i===iMax || i===n-1) s+=`<text class="v" x="${cx}" y="${(yy-5).toFixed(1)}" text-anchor="middle">${esc(fmtV(it.value))}</text>`;
+    if(todas || i%every===0 || i===n-1) s+=`<text x="${cx}" y="${H-bottom+16}" text-anchor="middle">${esc(apretado&&it.short?it.short:it.label)}</text>`;
   });
   el.innerHTML=s+"</svg>";
 }
@@ -1242,7 +1248,7 @@ function renderSummary(){
   $("r-tablenote").textContent="";   // sin notas: la tabla habla sola
   const months=Object.keys(data.pagos).filter(inCtxMonth).sort(); // de más antiguo a más reciente
   const tp=$("r-pagos").querySelector("tbody"); tp.innerHTML="";
-  const mi=months.map(m=>{ const rows=data.pagos[m].rows||{}; const t=Object.values(rows).reduce((a,x)=>a+(x.amount||0),0); const tr=document.createElement("tr"); tr.innerHTML=`<td>${monthName(m)}</td><td class="n">${Object.keys(rows).length}</td><td class="n">${t} €</td>`; tp.append(tr); return {label:shortMonth(m),value:t}; });
+  const mi=months.map(m=>{ const rows=data.pagos[m].rows||{}; const t=Object.values(rows).reduce((a,x)=>a+(x.amount||0),0); const tr=document.createElement("tr"); tr.innerHTML=`<td>${monthName(m)}</td><td class="n">${Object.keys(rows).length}</td><td class="n">${t} €</td>`; tp.append(tr); return {label:shortMonth(m),short:MESES[+m.slice(5,7)-1].slice(0,3),value:t}; });
   bars($("r-chart-pag"), mi, v=>v+" €");
   const altas=Object.values(data.persons).filter(p=>isSocia(p)&&(p.socia.casal.date?inCtxMonth(String(p.socia.casal.date).slice(0,7)):ctx.season==="all"));   // solo las altas pagadas en la temporada que se mira $("r-socias").hidden=!altas.length;
   $("r-socias").textContent = `Altas del Casal de la Dona pagadas: ${altas.length} (${altas.reduce((a,p)=>a+(Number(p.socia.casal.amount)||0),0)} €, para Loli).`;
