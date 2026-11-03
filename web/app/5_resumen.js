@@ -63,7 +63,7 @@ function renderSummary(){
   const tp=$("r-pagos").querySelector("tbody"); tp.innerHTML="";
   const mi=months.map(m=>{ const rows=data.pagos[m].rows||{}; const t=Object.values(rows).reduce((a,x)=>a+(x.amount||0),0); const tr=document.createElement("tr"); tr.innerHTML=`<td>${monthName(m)}</td><td class="n">${Object.keys(rows).length}</td><td class="n">${t} €</td>`; tp.append(tr); return {label:shortMonth(m),value:t}; });
   bars($("r-chart-pag"), mi, v=>v+" €");
-  const altas=Object.values(data.persons).filter(p=>isSocia(p)); $("r-socias").hidden=!altas.length;
+  const altas=Object.values(data.persons).filter(p=>isSocia(p)&&(p.socia.casal.date?inCtxMonth(String(p.socia.casal.date).slice(0,7)):ctx.season==="all"));   // solo las altas pagadas en la temporada que se mira $("r-socias").hidden=!altas.length;
   $("r-socias").textContent = `Altas del Casal de la Dona pagadas: ${altas.length} (${altas.reduce((a,p)=>a+(Number(p.socia.casal.amount)||0),0)} €, para Loli).`;
 }
 
