@@ -6,7 +6,7 @@ const CAMPS_FITXA = ["dni","naixement","telefon","email","adreca"];
 const NOMS_CAMPS = {dni:"DNI", naixement:"fecha de nacimiento", telefon:"teléfono", email:"email", adreca:"dirección"};
 
 // La contraseña la eligen Mario y Emi: la PRIMERA que se escribe en una ficha se queda como contraseña.
-// Si se olvida: menú Teatre dels Records › Olvidé la contraseña de las fichas (la siguiente que se escriba será la nueva).
+// Si se olvida: menú Moviment Creatiu › Olvidé la contraseña de las fichas (la siguiente que se escriba será la nueva).
 function comprovarClau(d){
   const pr = PropertiesService.getScriptProperties(); const c = String(d.clau || ""); const actual = pr.getProperty("clauFitxes");
   if (!actual){ if (c.length < 4) throw new Error("contraseña demasiado corta"); pr.setProperty("clauFitxes", c); return "nueva"; }

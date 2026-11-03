@@ -1,4 +1,4 @@
-// Puente entre la página "Assistència Teatre dels Records" y esta hoja de cálculo.
+// Puente entre la página "Assistència Moviment Creatiu" y esta hoja de cálculo.
 // Se pega en Extensiones > Apps Script de la hoja y se publica como "Aplicación web".
 // Pestañas de DATOS (las escribe la web, no se tocan a mano): "dades · Persones", "dades · Sessions",
 // "dades · Pagaments", "dades · Config", "dades · Registre" (historial de cambios).
@@ -269,7 +269,7 @@ const CAMPS_FITXA = ["dni","naixement","telefon","email","adreca"];
 const NOMS_CAMPS = {dni:"DNI", naixement:"fecha de nacimiento", telefon:"teléfono", email:"email", adreca:"dirección"};
 
 // La contraseña la eligen Mario y Emi: la PRIMERA que se escribe en una ficha se queda como contraseña.
-// Si se olvida: menú Teatre dels Records › Olvidé la contraseña de las fichas (la siguiente que se escriba será la nueva).
+// Si se olvida: menú Moviment Creatiu › Olvidé la contraseña de las fichas (la siguiente que se escriba será la nueva).
 function comprovarClau(d){
   const pr = PropertiesService.getScriptProperties(); const c = String(d.clau || ""); const actual = pr.getProperty("clauFitxes");
   if (!actual){ if (c.length < 4) throw new Error("contraseña demasiado corta"); pr.setProperty("clauFitxes", c); return "nueva"; }

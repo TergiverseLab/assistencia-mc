@@ -1,4 +1,4 @@
-// Puente entre la página "Assistència Teatre dels Records" y esta hoja de cálculo.
+// Puente entre la página "Assistència Moviment Creatiu" y esta hoja de cálculo.
 // Se pega en Extensiones > Apps Script de la hoja y se publica como "Aplicación web".
 // Pestañas de DATOS (las escribe la web, no se tocan a mano): "dades · Persones", "dades · Sessions",
 // "dades · Pagaments", "dades · Config", "dades · Registre" (historial de cambios).
