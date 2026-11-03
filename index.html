@@ -371,10 +371,11 @@ footer .note,#ver{color:rgba(255,255,255,.8)}
       <div class="chart" id="r-chart-ses"></div>
       <details class="rses"><summary>Ver la lista de sesiones</summary><div class="scroll"><table id="r-sestable"><thead><tr><th>Sesión</th><th class="n">Personas</th></tr></thead><tbody></tbody></table></div></details>
       <p class="note" id="r-probes" hidden></p>
-      <h3 class="rsub" id="r-perstit">Asistencia de cada persona</h3>
-      <p class="note" id="r-nolista" hidden></p>
-      <p class="note" id="r-tablenote"></p>
-      <div class="scroll tall" id="r-wrap"><table id="r-table"><thead><tr><th>Persona</th><th class="n">Sesiones</th></tr></thead><tbody></tbody></table></div>
+      <details class="rses" id="r-perstit"><summary>Ver la asistencia de cada persona</summary>
+        <p class="note" id="r-nolista" hidden></p>
+        <p class="note" id="r-tablenote"></p>
+        <div class="scroll tall" id="r-wrap"><table id="r-table"><thead><tr><th>Persona</th><th class="n">Sesiones</th></tr></thead><tbody></tbody></table></div>
+      </details>
     </div>
     <div class="card">
       <h2>Cuotas por mes</h2>
@@ -570,7 +571,7 @@ async function pickStore(){
 
 (function(){
 // ===== 1. BASE: utilidades, temporadas, navegación, botón Guardar =====
-const APP_VERSION = "03/11 02:04:16";
+const APP_VERSION = "03/11 02:05:03";
 const SOCIA_AMOUNT = 20;            // alta del Casal de la Dona (pago único, va íntegro a Loli)
 const DEFAULT_AMOUNT = 40;          // cuota mensual de Moviment Creatiu
 const $ = id => document.getElementById(id);
