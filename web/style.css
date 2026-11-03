@@ -218,7 +218,7 @@ details.rses[open] summary{margin-bottom:6px}
   --title:"Helvetica Neue",Helvetica,Arial,sans-serif; --display:"Open Sans","Helvetica Neue",Arial,sans-serif; --body:"Open Sans","Source Sans 3",system-ui,sans-serif;
   color-scheme:light;
 }
-body{background:var(--bg) url("{{MC_PAPER}}") 0 0/760px auto repeat}   /* el papel del cartel */
+body{background:var(--bg) url("{{MC_PAPER}}") 0 0/640px auto repeat}   /* el papel del cartel */
 header.mc{background:transparent;display:block;height:auto;position:relative;color:#fff;margin:0 calc(-1 * max(16px, env(safe-area-inset-left,0px)));padding:6px max(16px, env(safe-area-inset-left,0px)) 0}
 header.mc>div,header.mc>p{padding:0}
 .mc-words{display:flex;justify-content:space-around;font:400 clamp(.95rem,4.2vw,1.25rem) var(--display);letter-spacing:.01em;margin:4px 0 6px}
