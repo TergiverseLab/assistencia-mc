@@ -256,3 +256,5 @@ footer .note,#ver{color:rgba(255,255,255,.8)}
 .p.on,.pay .tog.on,.btn.small.on{background:var(--sel);color:#fff;border-color:var(--sel-line)}
 .p.on input{accent-color:#fff}
 .p.on .quota{color:rgba(255,255,255,.85);border-color:rgba(255,255,255,.45)}
+.loli-ult{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:10px;font-size:.9rem;color:var(--muted)}
+.loli-ult b{color:var(--fg)}

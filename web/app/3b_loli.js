@@ -22,6 +22,10 @@ function renderLoli(){
   const pend=mesesLoli(hoy).map(loliDe).filter(x=>!x.entregado && x.total>0);
   const cerrados=pend.filter(x=>x.mes<hoy), enCurso=pend.find(x=>x.mes===hoy);
   const totalPend=r2(cerrados.reduce((a,x)=>a+x.total,0));
+  // Última entrega (todos los meses marcados el mismo día): se puede deshacer por si se marcó sin haber pagado
+  const ents=Object.entries(data.settings||{}).filter(([k,v])=>/^loli:\d{4}-\d{2}$/.test(k)&&v&&v.data);
+  const ultData=ents.map(([k,v])=>v.data).sort().pop();
+  const ult=ultData?{data:ultData, meses:ents.filter(([k,v])=>v.data===ultData).map(([k])=>k.slice(5)).sort(), total:r2(ents.filter(([k,v])=>v.data===ultData).reduce((a,[k,v])=>a+(Number(v.importe)||0),0))}:null;
   box.innerHTML=`<h2>Loli · Casal de la Dona</h2>
     <div class="loli-mes">
       <div class="lm-row"><span>Cuotas de ${esc(monthName(curMonth))}</span><b>${eur(v.cuotas)}</b></div>
@@ -36,7 +40,16 @@ function renderLoli(){
       <div class="lp-num">${eur(totalPend)}</div>
       <div class="lp-det">${cerrados.length?cerrados.map(x=>`${esc(monthName(x.mes))}: ${eur(x.total)}`).join(" · "):"Nada pendiente de los meses ya acabados."}${enCurso?`<br>${esc(monthName(hoy))} (en curso): ${eur(enCurso.total)} hasta ahora`:""}</div>
       ${totalPend?`<button class="btn small" id="lp-entregar" type="button">Entregado a Loli: ${eur(totalPend)}</button>`:""}
-    </div>`;
+    </div>
+    ${ult?`<div class="loli-ult" id="lp-ult"><span>Última entrega: <b>${eur(ult.total)}</b> el ${esc(fmt(ult.data))} (${ult.meses.map(m=>esc(monthName(m))).join(" y ")})</span><button class="btn small" id="lp-deshacer" type="button">Deshacer</button></div>`:""}`;
+  const u=$("lp-deshacer"); if(u) u.addEventListener("click",()=>{
+    confirmar($("lp-ult"), `¿Deshacer la entrega de ${eur(ult.total)} del ${fmt(ult.data)}? ${ult.meses.map(m=>monthName(m)).join(" y ")} volverá${ult.meses.length>1?"n":""} a salir como pendiente${ult.meses.length>1?"s":""}.`, "Sí, deshacer", async()=>{
+      const set={}; ult.meses.forEach(m=>{ set["loli:"+m]=null; });
+      const op={action:"settings", key:"c:loli", data:set}; aplicarOp(data,op); renderLoli(); updPendientes();
+      try{ await store.send(op); }catch(e){ setStatus("p-status","La hoja ha rechazado el cambio: "+e.message,"err"); refresh(); }
+      renderLoli(); updPendientes();
+    }, true);
+  });
   const b=$("lp-entregar"); if(b) b.addEventListener("click",()=>{
     confirmar(b, `¿Has entregado ${eur(totalPend)} a Loli? Quedará apuntado ${cerrados.map(x=>monthName(x.mes)).join(" y ")} como entregado, con fecha de hoy.`, "Sí, entregado", async()=>{
       const set={}; cerrados.forEach(x=>{ set["loli:"+x.mes]={data:todayISO(), importe:x.total}; });
