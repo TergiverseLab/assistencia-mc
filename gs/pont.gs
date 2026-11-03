@@ -10,7 +10,7 @@ const SHEETS = {
   pagos:    ["dades · Pagaments", ["mes","persona (id)","import","data pagament","actualitzat"], "Pagaments"],
   settings: ["dades · Config",    ["clau","valor","actualitzat"], "Config"],
   registre: ["dades · Registre",  ["data","acció","referència","detall"], ""],
-  fitxes:   ["dades · Fitxes",    ["id","DNI","data de naixement","telèfon","email","adreça","actualitzat"], ""], // datos personales: solo con clave
+  fitxes:   ["dades · Fitxes",    ["id","DNI","data de naixement","telèfon","email","adreça","actualitzat","nom i cognoms"], ""], // datos personales: solo con clave
 };
 
 function sheet(key){
@@ -24,6 +24,7 @@ function sheet(key){
     if (key === "registre") sh.getRange(1, 3, sh.getMaxRows(), 1).setNumberFormat("@");
     if (key === "fitxes") sh.getRange(1, 1, sh.getMaxRows(), 6).setNumberFormat("@");
   }
+  if (key === "fitxes" && sh.getLastColumn() < header.length){ sh.getRange(1, 1, 1, header.length).setValues([header]); sh.getRange(1, 8, sh.getMaxRows(), 1).setNumberFormat("@"); } // columna «nom i cognoms» añadida después
   return sh;
 }
 function rows(key){ const sh = sheet(key); const v = sh.getDataRange().getValues(); return v.slice(1); }
@@ -55,7 +56,7 @@ function llegirTot(){
     byMonth[m].rows[String(r[1])] = {amount:Number(r[2])||0, date:fmtDate(r[3]), savedAt:iso(r[4])}; });
   const settings = {}; rows("settings").filter(r=>r[0]).forEach(r=>{ try{ settings[String(r[0])] = JSON.parse(r[1]); }catch(e){ settings[String(r[0])] = r[1]; } });
   const reg = rows("registre").filter(r=>r[0]);
-  const refReg = r=>{ const a = String(r[1]); return a==="sessio" ? norm(r[2]) : (a==="pagaments"||a==="mes") ? fmtMonth(r[2]) : String(r[2]); };
+  const refReg = r=>{ const a = String(r[1]); return a==="sessio" ? norm(r[2]) : (a==="pagaments"||a==="mes"||a==="loli") ? fmtMonth(r[2]) : String(r[2]); };
   const registre = reg.slice(-400).reverse().map(r=>({ t:iso(r[0]), accio:String(r[1]), ref:refReg(r), text:String(r[3]) }));
   return { ok:true, persons, sessions, pagos:Object.values(byMonth), settings, registre };
 }

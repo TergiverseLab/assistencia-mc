@@ -51,8 +51,8 @@ function aplicarPersona(cur, id, set){
   if (set.to != null) p.to = String(set.to);
   if (set.socia != null){
     const ab = p.socia || {}, nou = set.socia || {};
-    Object.keys(nou).forEach(k=>{ if (!ab[k]) canvis.push("socia+" + k + ":" + nou[k].amount); });
-    Object.keys(ab).forEach(k=>{ if (!nou[k]) canvis.push("socia-" + k); });
+    Object.keys(nou).filter(k=>k[0]!=="_").forEach(k=>{ if (!ab[k]) canvis.push("socia+" + k + ":" + nou[k].amount); });
+    Object.keys(ab).filter(k=>k[0]!=="_").forEach(k=>{ if (!nou[k]) canvis.push("socia-" + k); });
     p.socia = nou;
   }
   return { p, canvis };
@@ -80,8 +80,8 @@ function textPersona(p, canvis){
     if (c === "baixa") return "Baja: " + p.name;
     if (c === "reactivada") return "Vuelve a estar activa: " + p.name;
     if (c.indexOf("nom:") === 0) return "Nombre cambiado: " + c.slice(4) + " → " + p.name;
-    if (c.indexOf("socia+") === 0){ const x = c.slice(6).split(":"); return "Socia " + x[0] + ": " + p.name + " (" + x[1] + " €)"; }
-    if (c.indexOf("socia-") === 0) return "Socia " + c.slice(6) + " quitada: " + p.name;
+    if (c.indexOf("socia+") === 0){ const x = c.slice(6).split(":"); return (x[0]==="casal" ? "Alta del Casal" : "Socia " + x[0]) + ": " + p.name + " (" + x[1] + " €)"; }
+    if (c.indexOf("socia-") === 0) return (c.slice(6)==="casal" ? "Alta del Casal quitada" : "Socia " + c.slice(6) + " quitada") + ": " + p.name;
     return c;
   }).join(" · ");
 }

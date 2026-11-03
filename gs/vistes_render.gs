@@ -186,7 +186,7 @@ function actualitzarSiCal(){
 }
 
 function onOpen(){
-  SpreadsheetApp.getUi().createMenu("Moviment Creatiu").addItem("Actualitzar ara", "actualitzarVistes").addItem("Olvidé la contraseña de las fichas", "oblidarClauFitxes").addToUi();
+  SpreadsheetApp.getUi().createMenu("Moviment Creatiu").addItem("Actualitzar ara", "actualitzarVistes").addItem("Importar fichas", "importarFitxes").addItem("Olvidé la contraseña de las fichas", "oblidarClauFitxes").addToUi();
 }
 
 // ===================== INSTAL·LACIÓ (ejecutar UNA vez) =====================
@@ -222,7 +222,8 @@ function vistaLoli(m){
   const files = mesos.map(mm=>{
     const q = m.pagos.filter(p=>p.mes===mm).reduce((a,p)=>a+p.imp,0); const al = altes(mm);
     const tot = loliMes(mm, q, al.length); const lli = cfg["loli:"+mm];
-    const pendent = Math.max(0, Math.round((tot - (lli ? Number(lli.importe)||0 : 0))*100)/100);   // si se entregó y luego entraron más cuotas, falta la diferencia if (mm >= LOLI_DES_DE) pend += pendent;
+    const pendent = Math.max(0, Math.round((tot - (lli ? Number(lli.importe)||0 : 0))*100)/100);   // si se entregó y luego entraron más cuotas, falta la diferencia
+    if (mm >= LOLI_DES_DE) pend += pendent;
     return [nomMes(mm), q, mm >= LOLI_DES_DE ? tot - 20*al.length : tot, al.length ? al.length + " × 20 € (" + al.map(p=>p.nom).join(", ") + ")" : "", tot,
             lli ? "✓ " + (lli.data ? dmy(lli.data) : "") : (mm < LOLI_DES_DE ? "(T1)" : ""), mm < LOLI_DES_DE ? "" : pendent || ""];
   });

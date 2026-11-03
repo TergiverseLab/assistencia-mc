@@ -10,7 +10,7 @@ const SHEETS = {
   pagos:    ["dades · Pagaments", ["mes","persona (id)","import","data pagament","actualitzat"], "Pagaments"],
   settings: ["dades · Config",    ["clau","valor","actualitzat"], "Config"],
   registre: ["dades · Registre",  ["data","acció","referència","detall"], ""],
-  fitxes:   ["dades · Fitxes",    ["id","DNI","data de naixement","telèfon","email","adreça","actualitzat"], ""], // datos personales: solo con clave
+  fitxes:   ["dades · Fitxes",    ["id","DNI","data de naixement","telèfon","email","adreça","actualitzat","nom i cognoms"], ""], // datos personales: solo con clave
 };
 
 function sheet(key){
@@ -24,6 +24,7 @@ function sheet(key){
     if (key === "registre") sh.getRange(1, 3, sh.getMaxRows(), 1).setNumberFormat("@");
     if (key === "fitxes") sh.getRange(1, 1, sh.getMaxRows(), 6).setNumberFormat("@");
   }
+  if (key === "fitxes" && sh.getLastColumn() < header.length){ sh.getRange(1, 1, 1, header.length).setValues([header]); sh.getRange(1, 8, sh.getMaxRows(), 1).setNumberFormat("@"); } // columna «nom i cognoms» añadida después
   return sh;
 }
 function rows(key){ const sh = sheet(key); const v = sh.getDataRange().getValues(); return v.slice(1); }
@@ -55,7 +56,7 @@ function llegirTot(){
     byMonth[m].rows[String(r[1])] = {amount:Number(r[2])||0, date:fmtDate(r[3]), savedAt:iso(r[4])}; });
   const settings = {}; rows("settings").filter(r=>r[0]).forEach(r=>{ try{ settings[String(r[0])] = JSON.parse(r[1]); }catch(e){ settings[String(r[0])] = r[1]; } });
   const reg = rows("registre").filter(r=>r[0]);
-  const refReg = r=>{ const a = String(r[1]); return a==="sessio" ? norm(r[2]) : (a==="pagaments"||a==="mes") ? fmtMonth(r[2]) : String(r[2]); };
+  const refReg = r=>{ const a = String(r[1]); return a==="sessio" ? norm(r[2]) : (a==="pagaments"||a==="mes"||a==="loli") ? fmtMonth(r[2]) : String(r[2]); };
   const registre = reg.slice(-400).reverse().map(r=>({ t:iso(r[0]), accio:String(r[1]), ref:refReg(r), text:String(r[3]) }));
   return { ok:true, persons, sessions, pagos:Object.values(byMonth), settings, registre };
 }
@@ -227,8 +228,8 @@ function aplicarPersona(cur, id, set){
   if (set.to != null) p.to = String(set.to);
   if (set.socia != null){
     const ab = p.socia || {}, nou = set.socia || {};
-    Object.keys(nou).forEach(k=>{ if (!ab[k]) canvis.push("socia+" + k + ":" + nou[k].amount); });
-    Object.keys(ab).forEach(k=>{ if (!nou[k]) canvis.push("socia-" + k); });
+    Object.keys(nou).filter(k=>k[0]!=="_").forEach(k=>{ if (!ab[k]) canvis.push("socia+" + k + ":" + nou[k].amount); });
+    Object.keys(ab).filter(k=>k[0]!=="_").forEach(k=>{ if (!nou[k]) canvis.push("socia-" + k); });
     p.socia = nou;
   }
   return { p, canvis };
@@ -256,17 +257,17 @@ function textPersona(p, canvis){
     if (c === "baixa") return "Baja: " + p.name;
     if (c === "reactivada") return "Vuelve a estar activa: " + p.name;
     if (c.indexOf("nom:") === 0) return "Nombre cambiado: " + c.slice(4) + " → " + p.name;
-    if (c.indexOf("socia+") === 0){ const x = c.slice(6).split(":"); return "Socia " + x[0] + ": " + p.name + " (" + x[1] + " €)"; }
-    if (c.indexOf("socia-") === 0) return "Socia " + c.slice(6) + " quitada: " + p.name;
+    if (c.indexOf("socia+") === 0){ const x = c.slice(6).split(":"); return (x[0]==="casal" ? "Alta del Casal" : "Socia " + x[0]) + ": " + p.name + " (" + x[1] + " €)"; }
+    if (c.indexOf("socia-") === 0) return (c.slice(6)==="casal" ? "Alta del Casal quitada" : "Socia " + c.slice(6) + " quitada") + ": " + p.name;
     return c;
   }).join(" · ");
 }
 // ===================== FICHAS: datos personales de cada persona =====================
-// DNI, fecha de nacimiento, teléfono, email y dirección. Van en "dades · Fitxes" y la web SOLO los lee o
+// Nombre y apellidos, DNI, fecha de nacimiento, teléfono, email y dirección. Van en "dades · Fitxes" y la web SOLO los lee o
 // escribe con la contraseña de las fichas. Sin ella, el puente no los da a nadie.
 // En el Registre solo se apunta QUÉ campos cambiaron, nunca los datos.
-const CAMPS_FITXA = ["dni","naixement","telefon","email","adreca"];
-const NOMS_CAMPS = {dni:"DNI", naixement:"fecha de nacimiento", telefon:"teléfono", email:"email", adreca:"dirección"};
+const CAMPS_FITXA = ["nom","dni","naixement","telefon","email","adreca"];
+const NOMS_CAMPS = {nom:"nombre y apellidos", dni:"DNI", naixement:"fecha de nacimiento", telefon:"teléfono", email:"email", adreca:"dirección"};
 
 // La contraseña la eligen Mario y Emi: la PRIMERA que se escribe en una ficha se queda como contraseña.
 // Si se olvida: menú Moviment Creatiu › Olvidé la contraseña de las fichas (la siguiente que se escriba será la nueva).
@@ -283,20 +284,39 @@ function oblidarClauFitxes(){
 }
 function llegirFitxes(){
   const o = {};
-  rows("fitxes").filter(r=>r[0]).forEach(r=>{ o[String(r[0])] = {dni:String(r[1]), naixement:fmtDate(r[2]), telefon:String(r[3]), email:String(r[4]), adreca:String(r[5]), savedAt:iso(r[6])}; });
+  rows("fitxes").filter(r=>r[0]).forEach(r=>{ o[String(r[0])] = {nom:String(r[7]==null?"":r[7]), dni:String(r[1]), naixement:fmtDate(r[2]), telefon:String(r[3]), email:String(r[4]), adreca:String(r[5]), savedAt:iso(r[6])}; });
   return o;
 }
 function opFitxa(d, ara){
   const sh = sheet("fitxes"); const v = sh.getDataRange().getValues(); let fila = -1;
   for (let i = 1; i < v.length; i++){ if (String(v[i][0]) === String(d.id)){ fila = i; break; } }
-  const cur = fila > 0 ? {dni:String(v[fila][1]), naixement:fmtDate(v[fila][2]), telefon:String(v[fila][3]), email:String(v[fila][4]), adreca:String(v[fila][5])} : {dni:"",naixement:"",telefon:"",email:"",adreca:""};
+  const cur = fila > 0 ? {nom:String(v[fila][7]==null?"":v[fila][7]), dni:String(v[fila][1]), naixement:fmtDate(v[fila][2]), telefon:String(v[fila][3]), email:String(v[fila][4]), adreca:String(v[fila][5])} : {nom:"",dni:"",naixement:"",telefon:"",email:"",adreca:""};
   const set = d.set || {}; const canvis = [];
   CAMPS_FITXA.forEach(k=>{ if (set[k] != null){ const nou = netejaText(String(set[k]).slice(0, 200)); if (nou !== cur[k]){ cur[k] = nou; canvis.push(NOMS_CAMPS[k]); } } });
-  const fil = [String(d.id), cur.dni, cur.naixement, cur.telefon, cur.email, cur.adreca, ara];
+  const fil = [String(d.id), cur.dni, cur.naixement, cur.telefon, cur.email, cur.adreca, ara, cur.nom];
   if (fila > 0) sh.getRange(fila+1, 1, 1, fil.length).setValues([fil]); else sh.appendRow(fil);
   const nom = nomsPersones()[String(d.id)] || d.id;
   registrar("persona", d.id, canvis.length ? "Ficha de " + nom + ": " + canvis.join(", ") : "Ficha de " + nom + ": sin cambios", ara);
   return Object.assign({id:String(d.id)}, cur, {savedAt:iso(ara)});
+}
+
+// Importar varias fichas de golpe (menú «Moviment Creatiu › Importar fichas»). Se pega un bloque que prepara
+// Claude en el chat: {"id": {"nom":"…","dni":"…","telefon":"…","adreca":"…"}, …}. Los datos solo pasan por
+// este cuadro y acaban en «dades · Fitxes»: no se guardan en el código ni en ningún otro sitio.
+function importarFitxes(){
+  const ui = SpreadsheetApp.getUi();
+  const r = ui.prompt("Importar fichas", "Pega aquí el bloque que te ha preparado Claude y pulsa Aceptar.", ui.ButtonSet.OK_CANCEL);
+  if (r.getSelectedButton() !== ui.Button.OK) return;
+  let d; try { d = JSON.parse(r.getResponseText()); } catch(e){ ui.alert("El texto pegado no se entiende. Cópialo entero, desde la primera llave { hasta la última }."); return; }
+  const noms = nomsPersones(); const ara = new Date(); const fets = [], desconeguts = [];
+  const lock = LockService.getScriptLock(); lock.waitLock(20000);
+  try {
+    Object.keys(d||{}).forEach(id=>{ if (!noms[id]){ desconeguts.push(id); return; }
+      const set = {}; CAMPS_FITXA.forEach(k=>{ if (d[id] && d[id][k] != null && String(d[id][k]).trim() !== "") set[k] = String(d[id][k]).trim(); });
+      opFitxa({id, set}, ara); fets.push(noms[id]); });
+  } finally { lock.releaseLock(); }
+  CacheService.getScriptCache().removeAll(["tot:"+versio()].filter(Boolean));
+  ui.alert("Fichas importadas: " + (fets.join(", ") || "ninguna") + (desconeguts.length ? "\n\nNo existen en Personas (no se han tocado): " + desconeguts.join(", ") : ""));
 }
 // ===================== VISTES · 1. CÀLCULS (sin tocar la hoja) =====================
 // Todo lo que se ve en las pestañas para mirar sale de aquí. Funciones puras: reciben filas y devuelven tablas.
@@ -630,7 +650,7 @@ function actualitzarSiCal(){
 }
 
 function onOpen(){
-  SpreadsheetApp.getUi().createMenu("Moviment Creatiu").addItem("Actualitzar ara", "actualitzarVistes").addItem("Olvidé la contraseña de las fichas", "oblidarClauFitxes").addToUi();
+  SpreadsheetApp.getUi().createMenu("Moviment Creatiu").addItem("Actualitzar ara", "actualitzarVistes").addItem("Importar fichas", "importarFitxes").addItem("Olvidé la contraseña de las fichas", "oblidarClauFitxes").addToUi();
 }
 
 // ===================== INSTAL·LACIÓ (ejecutar UNA vez) =====================
@@ -666,7 +686,8 @@ function vistaLoli(m){
   const files = mesos.map(mm=>{
     const q = m.pagos.filter(p=>p.mes===mm).reduce((a,p)=>a+p.imp,0); const al = altes(mm);
     const tot = loliMes(mm, q, al.length); const lli = cfg["loli:"+mm];
-    const pendent = Math.max(0, Math.round((tot - (lli ? Number(lli.importe)||0 : 0))*100)/100);   // si se entregó y luego entraron más cuotas, falta la diferencia if (mm >= LOLI_DES_DE) pend += pendent;
+    const pendent = Math.max(0, Math.round((tot - (lli ? Number(lli.importe)||0 : 0))*100)/100);   // si se entregó y luego entraron más cuotas, falta la diferencia
+    if (mm >= LOLI_DES_DE) pend += pendent;
     return [nomMes(mm), q, mm >= LOLI_DES_DE ? tot - 20*al.length : tot, al.length ? al.length + " × 20 € (" + al.map(p=>p.nom).join(", ") + ")" : "", tot,
             lli ? "✓ " + (lli.data ? dmy(lli.data) : "") : (mm < LOLI_DES_DE ? "(T1)" : ""), mm < LOLI_DES_DE ? "" : pendent || ""];
   });
