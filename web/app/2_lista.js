@@ -120,7 +120,7 @@ function shiftWed(n){
   const target = n>0 ? dates.find(d=>d>cur) : [...dates].reverse().find(d=>d<cur);
   if(target){ setDate(target); return; }
   const d=new Date(cur+"T12:00:00"); const dow=d.getDay();
-  let diff = n>0 ? ((4-dow+7)%7||7) : -(((dow-4+7)%7)||7);   // jueves d.setDate(d.getDate()+diff);
+  let diff = n>0 ? ((4-dow+7)%7||7) : -(((dow-4+7)%7)||7); d.setDate(d.getDate()+diff);   // 4 = jueves
   d.setMinutes(d.getMinutes()-d.getTimezoneOffset()); setDate(d.toISOString().slice(0,10));
 }
 $("l-prevw").addEventListener("click",()=>shiftWed(-1)); $("l-nextw").addEventListener("click",()=>shiftWed(1));

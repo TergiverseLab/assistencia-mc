@@ -251,3 +251,8 @@ footer .note,#ver{color:rgba(255,255,255,.8)}
 
 .adelantado{margin:10px 0 0;font-size:.95rem;color:var(--fg)}
 .adelantado b{font-weight:600}
+/* Selecciones (asistencia, cuotas, botones activos): teja del cartel, no marrón oscuro */
+:root{--sel:#C4553D;--sel-line:#B44B34}
+.p.on,.pay .tog.on,.btn.small.on{background:var(--sel);color:#fff;border-color:var(--sel-line)}
+.p.on input{accent-color:#fff}
+.p.on .quota{color:rgba(255,255,255,.85);border-color:rgba(255,255,255,.45)}

@@ -266,6 +266,11 @@ footer .note,#ver{color:rgba(255,255,255,.8)}
 
 .adelantado{margin:10px 0 0;font-size:.95rem;color:var(--fg)}
 .adelantado b{font-weight:600}
+/* Selecciones (asistencia, cuotas, botones activos): teja del cartel, no marrón oscuro */
+:root{--sel:#C4553D;--sel-line:#B44B34}
+.p.on,.pay .tog.on,.btn.small.on{background:var(--sel);color:#fff;border-color:var(--sel-line)}
+.p.on input{accent-color:#fff}
+.p.on .quota{color:rgba(255,255,255,.85);border-color:rgba(255,255,255,.45)}
 </style>
 </head>
 <body>
@@ -571,7 +576,7 @@ async function pickStore(){
 
 (function(){
 // ===== 1. BASE: utilidades, temporadas, navegación, botón Guardar =====
-const APP_VERSION = "03/11 02:05:03";
+const APP_VERSION = "03/11 02:07:11";
 const SOCIA_AMOUNT = 20;            // alta del Casal de la Dona (pago único, va íntegro a Loli)
 const DEFAULT_AMOUNT = 40;          // cuota mensual de Moviment Creatiu
 const $ = id => document.getElementById(id);
@@ -822,7 +827,7 @@ function shiftWed(n){
   const target = n>0 ? dates.find(d=>d>cur) : [...dates].reverse().find(d=>d<cur);
   if(target){ setDate(target); return; }
   const d=new Date(cur+"T12:00:00"); const dow=d.getDay();
-  let diff = n>0 ? ((4-dow+7)%7||7) : -(((dow-4+7)%7)||7);   // jueves d.setDate(d.getDate()+diff);
+  let diff = n>0 ? ((4-dow+7)%7||7) : -(((dow-4+7)%7)||7); d.setDate(d.getDate()+diff);   // 4 = jueves
   d.setMinutes(d.getMinutes()-d.getTimezoneOffset()); setDate(d.toISOString().slice(0,10));
 }
 $("l-prevw").addEventListener("click",()=>shiftWed(-1)); $("l-nextw").addEventListener("click",()=>shiftWed(1));
