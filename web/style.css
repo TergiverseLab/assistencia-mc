@@ -262,3 +262,7 @@ footer .note,#ver{color:rgba(255,255,255,.8)}
 .tarde{color:var(--bad);font-weight:700}
 /* Barra «Guardar» desactivada: opaca (antes se transparentaba la lista de debajo) */
 .savebar .btn:disabled{opacity:1;background:#D9C4BC;color:#7A5249;box-shadow:none}
+.loli-pend+.loli-pend{margin-top:10px}
+.loli-pend.atr{background:#F6DCD3}
+.loli-pend .lp-tit .tarde{text-transform:none;letter-spacing:0}
+.loli-pend:not(.atr):not(.cero) .lp-num{color:var(--fg)}

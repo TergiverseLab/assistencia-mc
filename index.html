@@ -277,6 +277,10 @@ footer .note,#ver{color:rgba(255,255,255,.8)}
 .tarde{color:var(--bad);font-weight:700}
 /* Barra «Guardar» desactivada: opaca (antes se transparentaba la lista de debajo) */
 .savebar .btn:disabled{opacity:1;background:#D9C4BC;color:#7A5249;box-shadow:none}
+.loli-pend+.loli-pend{margin-top:10px}
+.loli-pend.atr{background:#F6DCD3}
+.loli-pend .lp-tit .tarde{text-transform:none;letter-spacing:0}
+.loli-pend:not(.atr):not(.cero) .lp-num{color:var(--fg)}
 </style>
 </head>
 <body>
@@ -582,7 +586,7 @@ async function pickStore(){
 
 (function(){
 // ===== 1. BASE: utilidades, temporadas, navegación, botón Guardar =====
-const APP_VERSION = "03/11 02:29:21";
+const APP_VERSION = "03/11 02:45:39";
 const SOCIA_AMOUNT = 20;            // alta del Casal de la Dona (pago único, va íntegro a Loli)
 const DEFAULT_AMOUNT = 40;          // cuota mensual de Moviment Creatiu
 const $ = id => document.getElementById(id);
@@ -1029,7 +1033,11 @@ function renderLoli(){
   const yaEnt=x=>Number(x.entregado&&x.entregado.importe)||0, falta=x=>r2(Math.max(0,x.total-yaEnt(x)));
   const v=loliDe(curMonth);
   const pend=mesesLoli(hoy).map(loliDe).filter(x=>falta(x)>0);
-  const totalPend=r2(pend.reduce((a,x)=>a+falta(x),0)), algunoTarde=pend.some(x=>tarde(x.mes));
+  // Dos cajas: lo ATRASADO (pasado el día 10 de su mes) y lo del mes EN PLAZO (antes del 10). Cada una con su botón.
+  const suma=l=>r2(l.reduce((a,x)=>a+falta(x),0)), linea=x=>`${esc(monthName(x.mes))}: ${eur(falta(x))}${yaEnt(x)?" (lo que faltaba)":""}`;
+  const atr=pend.filter(x=>tarde(x.mes)), enPlazo=pend.filter(x=>!tarde(x.mes)), cajas=[];
+  if(atr.length) cajas.push({id:"atr", atr:true, lista:atr, total:suma(atr), titulo:'Atrasado · <span class="tarde">fuera de plazo</span>', det:atr.map(linea).join("<br>")});
+  enPlazo.forEach(x=>cajas.push({id:x.mes, lista:[x], total:falta(x), titulo:`${esc(monthName(x.mes))} · antes del ${diaLim(x.mes)}`, det:x.mes===hoy?"Hasta ahora: sube con cada cuota de este mes que apuntes.":(yaEnt(x)?"Lo que faltaba.":"")}));
   // Última entrega (todos los meses marcados el mismo día): se puede deshacer por si se marcó sin haber pagado
   const ents=Object.entries(data.settings||{}).filter(([k,v])=>/^loli:\d{4}-\d{2}$/.test(k)&&v&&v.data);
   const sello=v=>v.ts||v.data;   /* cada entrega lleva su hora: dos entregas del mismo día no se mezclan */
@@ -1047,13 +1055,13 @@ function renderLoli(){
       <div class="lm-row lm-tuyo"><span>Tuyo</span><b>${eur(v.tuyo)}</b></div>
       ${estadoMes?`<p class="lm-estado">${estadoMes}</p>`:""}
     </div>
-    <div class="loli-pend ${totalPend?"":"cero"}">
-      <div class="lp-tit">Pendiente de entregar a Loli</div>
-      <div class="lp-num">${eur(totalPend)}</div>
-      <div class="lp-det">${pend.length?pend.map(x=>`${esc(monthName(x.mes))}: ${eur(falta(x))}${yaEnt(x)?" (lo que faltaba)":""} · ${tarde(x.mes)?'<b class="tarde">fuera de plazo</b>':"antes del "+diaLim(x.mes)}`).join("<br>"):"Nada pendiente."}</div>
-      ${totalPend?`<button class="btn small" id="lp-entregar" type="button">Entregado a Loli: ${eur(totalPend)}</button>`:""}
-    </div>
-    ${ult?`<div class="loli-ult" id="lp-ult"><span>Última entrega: <b>${eur(ult.total)}</b> el ${esc(fmt(ult.data))} (${ult.meses.map(m=>esc(monthName(m))).join(" y ")})</span><button class="btn small" id="lp-deshacer" type="button">Deshacer</button></div>`:""}`;
+    ${pend.length ? cajas.map(c=>`<div class="loli-pend${c.atr?" atr":""}">
+      <div class="lp-tit">${c.titulo}</div>
+      <div class="lp-num">${eur(c.total)}</div>
+      ${c.det?`<div class="lp-det">${c.det}</div>`:""}
+      <button class="btn small" data-entregar="${c.id}" type="button">Entregado a Loli: ${eur(c.total)}</button>
+    </div>`).join("") : `<div class="loli-pend cero"><div class="lp-tit">Pendiente de entregar a Loli</div><div class="lp-num">0 €</div><div class="lp-det">Nada pendiente.</div></div>`}
+    ${ult?`<div class="loli-ult" id="lp-ult"><span>Última entrega: <b>${eur(ult.total)}</b> el ${esc(fmt(ult.data))} (${(l=>l.length>1?l.slice(0,-1).join(", ")+" y "+l[l.length-1]:l[0])(ult.meses.map(m=>esc(monthName(m))))})</span><button class="btn small" id="lp-deshacer" type="button">Deshacer</button></div>`:""}`;
   const u=$("lp-deshacer"); if(u) u.addEventListener("click",()=>{
     confirmar($("lp-ult"), `¿Deshacer la entrega de ${eur(ult.total)} del ${fmt(ult.data)}? Volverá a salir como pendiente.`, "Sí, deshacer", async()=>{
       const set={}; ult.ents.forEach(([k,v])=>{ set[k]=v.antes||null; });   // vuelve a como estaba antes de esa entrega
@@ -1062,14 +1070,14 @@ function renderLoli(){
       renderLoli(); updPendientes();
     }, true);
   });
-  const b=$("lp-entregar"); if(b) b.addEventListener("click",()=>{
-    confirmar(b, `¿Has entregado ${eur(totalPend)} a Loli? Quedará apuntado como entregado (${pend.map(x=>monthName(x.mes)).join(", ")}), con fecha de hoy.`, "Sí, entregado", async()=>{
-      const set={}; pend.forEach(x=>{ const e=x.entregado; set["loli:"+x.mes]={data:hoyD, ts:new Date().toISOString(), importe:x.total, ...(e&&e.importe?{antes:e}:{})}; });
+  box.querySelectorAll("[data-entregar]").forEach(b=>b.addEventListener("click",()=>{ const c=cajas.find(c=>c.id===b.dataset.entregar); if(!c) return;
+    confirmar(b, `¿Has entregado ${eur(c.total)} a Loli? Quedará apuntado como entregado (${c.lista.map(x=>monthName(x.mes)).join(", ")}), con fecha de hoy.`, "Sí, entregado", async()=>{
+      const set={}; c.lista.forEach(x=>{ const e=x.entregado; set["loli:"+x.mes]={data:hoyD, ts:new Date().toISOString(), importe:x.total, ...(e&&e.importe?{antes:e}:{})}; });
       const op={action:"settings", key:"c:loli", data:set}; aplicarOp(data,op); renderLoli(); updPendientes();
       try{ await store.send(op); }catch(e){ setStatus("p-status","La hoja ha rechazado el cambio: "+e.message,"err"); refresh(); }
       renderLoli(); updPendientes();
     });
-  });
+  }));
 }
 
 // ===== 4. PERSONAS =====
