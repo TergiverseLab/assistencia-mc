@@ -45,7 +45,8 @@ function renderSummary(){
   const gente=new Set(); ids.forEach(id=>data.sessions[id].present.forEach(p=>gente.add(p)));
   if(ctx.group==="all") Object.keys(data.pagos).filter(inCtxMonth).forEach(m=>Object.keys(data.pagos[m].rows||{}).forEach(p=>gente.add(p)));
   const asis=ids.map(id=>sesAsistencia(id,ctx.group)).filter(v=>v!=null); const media=asis.length?asis.reduce((a,b)=>a+b,0)/asis.length:0;
-  $("r-sess").textContent=n; $("r-avg").textContent=asis.length?media.toFixed(1).replace(".",","):"–"; $("r-new").textContent=gente.size;
+  $("r-sess").textContent=n; $("r-avg").textContent=asis.length?media.toFixed(1).replace(".",","):"–"; if(ctx.season===curSeasonKey()) activePersons().forEach(p=>gente.add(p.id));   // apuntadas: las que han venido + las que siguen de alta
+  $("r-new").textContent=gente.size;
   const probes=new Set(); ids.forEach(id=>(data.sessions[id].others||[]).forEach(o=>probes.add(o.toLowerCase())));
   $("r-probes").hidden=!probes.size; $("r-probes").textContent=`${probes.size} ${probes.size===1?"persona ha":"personas han"} venido a probar.`;
   bars($("r-chart-ses"), ids.map(id=>({label:fmt(data.sessions[id].date||id).slice(0,5)+(multiGroup&&data.sessions[id].group?" "+data.sessions[id].group[0]:""), value:Math.round(sesAsistencia(id,ctx.group)||0)})), v=>String(v));
