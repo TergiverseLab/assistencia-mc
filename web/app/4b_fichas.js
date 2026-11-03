@@ -24,6 +24,9 @@ function toggleFicha(pid,row){
   document.querySelectorAll("#n-list .ficha").forEach(f=>f.remove());
   const f=document.createElement("div"); f.className="ficha"; f.dataset.pid=pid; row.after(f); pintarFicha(f);
 }
+// Antes se guardaba aquí el nombre completo («Abel Madrid Gómez»). Si llega así, se enseña solo el segundo apellido
+// (la última palabra); al guardar la ficha queda ya bien. Un segundo apellido compuesto («de la Torre») se respeta.
+function segundoApellido(v){ v=String(v||"").trim(); const w=v.split(/\s+/); return (w.length>=3 && !/^(de|del|la|las|los|y|i|d')$/i.test(w[0])) ? w[w.length-1] : v; }
 function pintarFicha(f){
   const pid=f.dataset.pid, p=data.persons[pid]; if(!p){ f.remove(); return; }
   const season=curSeasonKey(), off=p.active===false, soc=p.socia&&p.socia[SOCIA_K];
@@ -41,7 +44,7 @@ function pintarFicha(f){
   else if(fitxes===null) personal=`<p class="note">${esc(fitxesError)}</p><button class="btn ghost small f-reint" type="button">Volver a probar</button>`;
   else personal=`<div class="campos">
       <label>Nombre y primer apellido <small>(es el que sale en las listas)</small><input type="text" data-k="name" value="${esc(p.name)}"></label>
-      ${CAMPOS_FICHA.map(([k,l,t])=>`<label>${esc(l)}<input type="${t}" data-k="${k}" value="${esc(fx[k]||"")}" ${t==="tel"?'inputmode="tel"':""} autocomplete="off"></label>`).join("")}
+      ${CAMPOS_FICHA.map(([k,l,t])=>`<label>${esc(l)}<input type="${t}" data-k="${k}" value="${esc(k==="nom"?segundoApellido(fx.nom):(fx[k]||""))}" ${t==="tel"?'inputmode="tel"':""} autocomplete="off"></label>`).join("")}
     </div>
     ${fitxesAviso?`<p class="status ok">${esc(fitxesAviso)}</p>`:""}
     <div class="row"><button class="btn small f-save" type="button">Guardar y cerrar</button><button class="btn ghost small f-cerrar" type="button">Cerrar</button><span class="saved f-saved ${fx.savedAt?"ok":""}">${fx.savedAt?"Guardada el "+esc(hora(fx.savedAt)):""}</span></div>`;
