@@ -10,7 +10,7 @@ const SHEETS = {
   pagos:    ["dades · Pagaments", ["mes","persona (id)","import","data pagament","actualitzat"], "Pagaments"],
   settings: ["dades · Config",    ["clau","valor","actualitzat"], "Config"],
   registre: ["dades · Registre",  ["data","acció","referència","detall"], ""],
-  fitxes:   ["dades · Fitxes",    ["id","DNI","data de naixement","telèfon","email","adreça","actualitzat","nom i cognoms"], ""], // datos personales: solo con clave
+  fitxes:   ["dades · Fitxes",    ["id","DNI","data de naixement","telèfon","email","adreça","actualitzat","segon cognom"], ""], // datos personales: solo con clave
 };
 
 function sheet(key){
@@ -24,7 +24,7 @@ function sheet(key){
     if (key === "registre") sh.getRange(1, 3, sh.getMaxRows(), 1).setNumberFormat("@");
     if (key === "fitxes") sh.getRange(1, 1, sh.getMaxRows(), 6).setNumberFormat("@");
   }
-  if (key === "fitxes" && sh.getLastColumn() < header.length){ sh.getRange(1, 1, 1, header.length).setValues([header]); sh.getRange(1, 8, sh.getMaxRows(), 1).setNumberFormat("@"); } // columna «nom i cognoms» añadida después
+  if (key === "fitxes" && (sh.getLastColumn() < header.length || String(sh.getRange(1, 8).getValue()) !== header[7])){ sh.getRange(1, 1, 1, header.length).setValues([header]); sh.getRange(1, 8, sh.getMaxRows(), 1).setNumberFormat("@"); } // columna 8 (segundo apellido) añadida después
   return sh;
 }
 function rows(key){ const sh = sheet(key); const v = sh.getDataRange().getValues(); return v.slice(1); }

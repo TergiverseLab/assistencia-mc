@@ -350,7 +350,7 @@ footer .note,#ver{color:rgba(255,255,255,.8)}
   <section id="view-pers" class="view" hidden>
     <div class="card">
       <h2>Alta nueva</h2>
-      <div class="row"><input type="text" id="n-name" placeholder="Nombre y apellido" autocomplete="off" style="flex:1"><button class="btn" id="n-add" type="button">Añadir</button></div>
+      <div class="row"><input type="text" id="n-name" placeholder="Nombre y primer apellido" autocomplete="off" style="flex:1"><button class="btn" id="n-add" type="button">Añadir</button></div>
       <span class="status" id="n-status" aria-live="polite"></span>
       <p class="note">La persona aparece en la lista desde el mes actual. Para una baja, toca "Baja": deja de salir en la lista pero conserva su historial. Toca un nombre para ver su ficha.</p>
     </div>
@@ -586,7 +586,7 @@ async function pickStore(){
 
 (function(){
 // ===== 1. BASE: utilidades, temporadas, navegación, botón Guardar =====
-const APP_VERSION = "03/11 02:45:39";
+const APP_VERSION = "03/11 03:22:33";
 const SOCIA_AMOUNT = 20;            // alta del Casal de la Dona (pago único, va íntegro a Loli)
 const DEFAULT_AMOUNT = 40;          // cuota mensual de Moviment Creatiu
 const $ = id => document.getElementById(id);
@@ -1149,7 +1149,7 @@ $("n-add").addEventListener("click",async()=>{
 // Los datos personales NO van con el resto: el puente solo los da con la contraseña de las fichas (la eligen Mario y
 // Emi: la primera que se escribe se queda). Se pide CADA VEZ que se abren los datos de una persona; ni la contraseña
 // ni los datos se guardan en el móvil.
-const CAMPOS_FICHA=[["nom","Nombre y apellidos","text"],["dni","DNI","text"],["naixement","Fecha de nacimiento","date"],["telefon","Teléfono","tel"],["email","Email","email"],["adreca","Dirección","text"]];
+const CAMPOS_FICHA=[["nom","Segundo apellido","text"],["dni","DNI","text"],["naixement","Fecha de nacimiento","date"],["telefon","Teléfono","tel"],["email","Email","email"],["adreca","Dirección","text"]];
 let fitxes=null, fitxesError="", fitxesAviso="";   // null = sin cargar
 let clauMem="";                                     // solo en memoria
 const clauFichas=()=>clauMem;
@@ -1185,7 +1185,7 @@ function pintarFicha(f){
   else if(fitxes===null && !fitxesError) personal=`<p class="note">Cargando…</p>`;
   else if(fitxes===null) personal=`<p class="note">${esc(fitxesError)}</p><button class="btn ghost small f-reint" type="button">Volver a probar</button>`;
   else personal=`<div class="campos">
-      <label>Nombre<input type="text" data-k="name" value="${esc(p.name)}"></label>
+      <label>Nombre y primer apellido <small>(es el que sale en las listas)</small><input type="text" data-k="name" value="${esc(p.name)}"></label>
       ${CAMPOS_FICHA.map(([k,l,t])=>`<label>${esc(l)}<input type="${t}" data-k="${k}" value="${esc(fx[k]||"")}" ${t==="tel"?'inputmode="tel"':""} autocomplete="off"></label>`).join("")}
     </div>
     ${fitxesAviso?`<p class="status ok">${esc(fitxesAviso)}</p>`:""}

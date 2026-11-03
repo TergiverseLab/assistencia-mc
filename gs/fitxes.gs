@@ -1,9 +1,9 @@
 // ===================== FICHAS: datos personales de cada persona =====================
-// Nombre y apellidos, DNI, fecha de nacimiento, teléfono, email y dirección. Van en "dades · Fitxes" y la web SOLO los lee o
+// Segundo apellido, DNI, fecha de nacimiento, teléfono, email y dirección. (Nombre y primer apellido = el nombre público de Personas.) Van en "dades · Fitxes" y la web SOLO los lee o
 // escribe con la contraseña de las fichas. Sin ella, el puente no los da a nadie.
 // En el Registre solo se apunta QUÉ campos cambiaron, nunca los datos.
 const CAMPS_FITXA = ["nom","dni","naixement","telefon","email","adreca"];
-const NOMS_CAMPS = {nom:"nombre y apellidos", dni:"DNI", naixement:"fecha de nacimiento", telefon:"teléfono", email:"email", adreca:"dirección"};
+const NOMS_CAMPS = {nom:"segundo apellido", dni:"DNI", naixement:"fecha de nacimiento", telefon:"teléfono", email:"email", adreca:"dirección"};
 
 // La contraseña la eligen Mario y Emi: la PRIMERA que se escribe en una ficha se queda como contraseña.
 // Si se olvida: menú Moviment Creatiu › Olvidé la contraseña de las fichas (la siguiente que se escriba será la nueva).
@@ -37,7 +37,7 @@ function opFitxa(d, ara){
 }
 
 // Importar varias fichas de golpe (menú «Moviment Creatiu › Importar fichas»). Se pega un bloque que prepara
-// Claude en el chat: {"id": {"nom":"…","dni":"…","telefon":"…","adreca":"…"}, …}. Los datos solo pasan por
+// Claude en el chat: {"id": {"name":"Nombre Apellido1","nom":"Apellido2","dni":"…","telefon":"…","adreca":"…"}, …}. Los datos solo pasan por
 // este cuadro y acaban en «dades · Fitxes»: no se guardan en el código ni en ningún otro sitio.
 function importarFitxes(){
   const ui = SpreadsheetApp.getUi();
@@ -49,7 +49,8 @@ function importarFitxes(){
   try {
     Object.keys(d||{}).forEach(id=>{ if (!noms[id]){ desconeguts.push(id); return; }
       const set = {}; CAMPS_FITXA.forEach(k=>{ if (d[id] && d[id][k] != null && String(d[id][k]).trim() !== "") set[k] = String(d[id][k]).trim(); });
-      opFitxa({id, set}, ara); fets.push(noms[id]); });
+      if (d[id] && d[id].name && String(d[id].name).trim() && String(d[id].name).trim() !== noms[id]) opPersona({id, set:{name:String(d[id].name).trim()}}, ara);   // nombre y primer apellido (el que sale en las listas)
+      opFitxa({id, set}, ara); fets.push(String((d[id]&&d[id].name)||noms[id])); });
   } finally { lock.releaseLock(); }
   CacheService.getScriptCache().removeAll(["tot:"+versio()].filter(Boolean));
   ui.alert("Fichas importadas: " + (fets.join(", ") || "ninguna") + (desconeguts.length ? "\n\nNo existen en Personas (no se han tocado): " + desconeguts.join(", ") : ""));

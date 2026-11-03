@@ -4,7 +4,7 @@
 // Los datos personales NO van con el resto: el puente solo los da con la contraseña de las fichas (la eligen Mario y
 // Emi: la primera que se escribe se queda). Se pide CADA VEZ que se abren los datos de una persona; ni la contraseña
 // ni los datos se guardan en el móvil.
-const CAMPOS_FICHA=[["nom","Nombre y apellidos","text"],["dni","DNI","text"],["naixement","Fecha de nacimiento","date"],["telefon","Teléfono","tel"],["email","Email","email"],["adreca","Dirección","text"]];
+const CAMPOS_FICHA=[["nom","Segundo apellido","text"],["dni","DNI","text"],["naixement","Fecha de nacimiento","date"],["telefon","Teléfono","tel"],["email","Email","email"],["adreca","Dirección","text"]];
 let fitxes=null, fitxesError="", fitxesAviso="";   // null = sin cargar
 let clauMem="";                                     // solo en memoria
 const clauFichas=()=>clauMem;
@@ -40,7 +40,7 @@ function pintarFicha(f){
   else if(fitxes===null && !fitxesError) personal=`<p class="note">Cargando…</p>`;
   else if(fitxes===null) personal=`<p class="note">${esc(fitxesError)}</p><button class="btn ghost small f-reint" type="button">Volver a probar</button>`;
   else personal=`<div class="campos">
-      <label>Nombre<input type="text" data-k="name" value="${esc(p.name)}"></label>
+      <label>Nombre y primer apellido <small>(es el que sale en las listas)</small><input type="text" data-k="name" value="${esc(p.name)}"></label>
       ${CAMPOS_FICHA.map(([k,l,t])=>`<label>${esc(l)}<input type="${t}" data-k="${k}" value="${esc(fx[k]||"")}" ${t==="tel"?'inputmode="tel"':""} autocomplete="off"></label>`).join("")}
     </div>
     ${fitxesAviso?`<p class="status ok">${esc(fitxesAviso)}</p>`:""}
