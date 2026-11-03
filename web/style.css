@@ -149,6 +149,7 @@ footer{display:flex;justify-content:flex-end;color:var(--line);font-size:.65rem;
 .chart text{font-family:var(--body);fill:var(--muted);font-size:11px}
 .chart text.v{fill:var(--fg);font-weight:600}
 .chart svg.apretada text{font-size:9.5px}
+.chart svg.muchas text.v{font-size:7.5px}
 .chart line{stroke:var(--line)}
 textarea{font:inherit;font-size:.85rem;width:100%;min-height:140px;background:var(--soft);color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:10px}
 .banner{background:var(--soft);border-radius:10px;padding:10px 12px;font-size:.9rem}
@@ -259,3 +260,5 @@ footer .note,#ver{color:rgba(255,255,255,.8)}
 .loli-ult{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:10px;font-size:.9rem;color:var(--muted)}
 .loli-ult b{color:var(--fg)}
 .tarde{color:var(--bad);font-weight:700}
+/* Barra «Guardar» desactivada: opaca (antes se transparentaba la lista de debajo) */
+.savebar .btn:disabled{opacity:1;background:#D9C4BC;color:#7A5249;box-shadow:none}

@@ -21,7 +21,7 @@ function renderPersons(){
   const cur = ctx.season===curSeasonKey();
   const all=Object.values(data.persons).filter(p=>{
     if(ctx.season==="all") return true;
-    if(cur && ctx.group==="all") return p.active!==false || (ps[p.id]&&ps[p.id].seasons.has(ctx.season));
+    if(cur && ctx.group==="all") return p.active!==false || (ps[p.id]&&ps[p.id].seasons.has(ctx.season)) || (!!p.to && seasonOf(p.to)===ctx.season);
     const v=ps[p.id]; if(!v||!v.seasons.has(ctx.season)) return false;
     return ctx.group==="all" || v.groups.has(ctx.group);
   }).sort((a,b)=>(a.active===false)-(b.active===false)||a.name.localeCompare(b.name,"es"));
@@ -45,8 +45,9 @@ function renderPersons(){
   }));
   list.querySelectorAll("button[data-soc]").forEach(b=>b.addEventListener("click",async()=>{
     const p=data.persons[b.dataset.soc]; const socia={...(p.socia||{})};
-    if(socia[SOCIA_K]) delete socia[SOCIA_K]; else socia[SOCIA_K]={amount:SOCIA_AMOUNT,date:todayISO()};
-    b.disabled=true; await guardarPersona(p.id,{socia}); renderPersons();
+    if(socia[SOCIA_K]){ socia._casal=socia[SOCIA_K]; delete socia[SOCIA_K]; } else { socia[SOCIA_K]=socia._casal||{amount:SOCIA_AMOUNT,date:todayISO()}; delete socia._casal; }   /* al volver a marcar, conserva la fecha del alta (no se cobra dos veces a Loli) */
+    const hacer=async()=>{ b.disabled=true; await guardarPersona(p.id,{socia}); renderPersons(); };
+    if(p.socia&&p.socia[SOCIA_K]) confirmar(b.closest(".person"), `¿Quitar el alta del Casal de ${p.name}? Dejará de contar para Loli.`, "Sí, quitar", hacer, true); else hacer();
   }));
 }
 $("n-add").addEventListener("click",async()=>{

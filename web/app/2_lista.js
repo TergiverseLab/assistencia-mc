@@ -54,7 +54,7 @@ const bajo=a=>a.map(x=>x.toLowerCase()).sort().join(",");
 function listaTocada(){ return checked().slice().sort().join()!==baseSes.present.slice().sort().join() || bajo(others())!==bajo(baseSes.others||[]); }
 
 // Borrador: lo marcado se guarda en el móvil al instante y se recupera si se recarga antes de pulsar Guardar
-const draftKey=()=>"tdr-draft-"+(curSessionId||$("l-date").value||""); // misma clave antes y después de que exista la sesión
+const draftKey=()=>"mc-draft-"+(curSessionId||$("l-date").value||""); // misma clave antes y después de que exista la sesión
 function saveDraft(){ try{ if(listaTocada()) localStorage.setItem(draftKey(),JSON.stringify({present:checked(),others:$("l-others").value,base:baseSes.present,baseOthers:baseSes.others,t:Date.now()})); else localStorage.removeItem(draftKey()); }catch(e){} }
 function clearDraft(k){ try{ localStorage.removeItem(k||draftKey()); }catch(e){} }
 function readDraft(){ try{ return JSON.parse(localStorage.getItem(draftKey())||"null"); }catch(e){ return null; } }
@@ -117,12 +117,15 @@ $("l-group").addEventListener("change",()=>{ setDate($("l-date").value, $("l-gro
 function shiftWed(n){
   const cur=$("l-date").value||todayISO();
   const dates=[...new Set(Object.keys(data.sessions).map(k=>data.sessions[k].date||k))].sort();
-  const target = n>0 ? dates.find(d=>d>cur) : [...dates].reverse().find(d=>d<cur);
-  if(target){ setDate(target); return; }
+  const reg = n>0 ? dates.find(d=>d>cur) : [...dates].reverse().find(d=>d<cur);
   const d=new Date(cur+"T12:00:00"); const dow=d.getDay();
   let diff = n>0 ? ((4-dow+7)%7||7) : -(((dow-4+7)%7)||7); d.setDate(d.getDate()+diff);   // 4 = jueves
-  d.setMinutes(d.getMinutes()-d.getTimezoneOffset()); setDate(d.toISOString().slice(0,10));
+  d.setMinutes(d.getMinutes()-d.getTimezoneOffset()); const jue=d.toISOString().slice(0,10);
+  // la más cercana de las dos: el jueves de al lado o una sesión registrada que caiga antes (p. ej. en otro día)
+  setDate(!reg ? jue : n>0 ? (reg<jue?reg:jue) : (reg>jue?reg:jue));
 }
+// Al abrir: el jueves de hoy o, si hoy no es jueves, el último jueves (no una «sesión nueva» de martes)
+function diaInicial(){ const d=new Date(todayISO()+"T12:00:00"); d.setDate(d.getDate()-((d.getDay()-4+7)%7)); d.setMinutes(d.getMinutes()-d.getTimezoneOffset()); return d.toISOString().slice(0,10); }
 $("l-prevw").addEventListener("click",()=>shiftWed(-1)); $("l-nextw").addEventListener("click",()=>shiftWed(1));
 $("l-date").addEventListener("change",()=>{ if($("l-date").value) setDate($("l-date").value); });
 

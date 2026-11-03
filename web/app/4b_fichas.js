@@ -4,7 +4,7 @@
 // Los datos personales NO van con el resto: el puente solo los da con la contraseña de las fichas (la eligen Mario y
 // Emi: la primera que se escribe se queda). Se pide CADA VEZ que se abren los datos de una persona; ni la contraseña
 // ni los datos se guardan en el móvil.
-const CAMPOS_FICHA=[["dni","DNI","text"],["naixement","Fecha de nacimiento","date"],["telefon","Teléfono","tel"],["email","Email","email"],["adreca","Dirección","text"]];
+const CAMPOS_FICHA=[["nom","Nombre y apellidos","text"],["dni","DNI","text"],["naixement","Fecha de nacimiento","date"],["telefon","Teléfono","tel"],["email","Email","email"],["adreca","Dirección","text"]];
 let fitxes=null, fitxesError="", fitxesAviso="";   // null = sin cargar
 let clauMem="";                                     // solo en memoria
 const clauFichas=()=>clauMem;
@@ -56,14 +56,17 @@ function pintarFicha(f){
     <dl>
       <dt>Temporadas</dt><dd>${[...temps].sort().map(seasonLabel).map(esc).join("<br>")||"—"}</dd>
       <dt>Sesiones con lista</dt><dd>${conLista.length}${conLista.length?` <small>(última: ${esc(fmt(data.sessions[conLista[conLista.length-1]].date||conLista[conLista.length-1]))})</small>`:""}</dd>
-      <dt>Cuotas</dt><dd>${pagos.length?`${pagos.length} meses · ${pagos.reduce((a,x)=>a+x.a,0)} €<br><small>${pagos.map(x=>esc(shortMonth(x.m))+" "+x.a+" €").join(" · ")}</small>`:"—"}</dd>
+      <dt>Cuotas</dt><dd>${pagos.length?`${pagos.length} ${pagos.length===1?"mes":"meses"} · ${pagos.reduce((a,x)=>a+x.a,0)} €<br><small>${pagos.map(x=>esc(shortMonth(x.m))+" "+x.a+" €").join(" · ")}</small>`:"—"}</dd>
       <dt>Alta del Casal</dt><dd>${p.socia&&p.socia.casal?`Pagada (${Number(p.socia.casal.amount)||20} €${p.socia.casal.date?", "+esc(fmt(p.socia.casal.date)):""})`:"No consta"}</dd>
     </dl>`;
   const st=f.querySelector(".f-status"); const q=c=>f.querySelector(c);
   const tras=async()=>{ renderPersons(); renderRoster(); }; // renderPersons ya deja la ficha abierta
   if(q(".f-baja")) q(".f-baja").addEventListener("click",async e=>{ const hacer=async()=>{ e.target.disabled=true; await guardarPersona(pid, off?{active:true,to:""}:{active:false,to:todayISO().slice(0,7)}, st); tras(); };
     if(off) hacer(); else confirmar(q(".f-estado"), `¿Estás seguro de dar de baja a ${p.name}? Deja de salir en la lista (conserva su historial).`, "Sí, dar de baja", hacer, true); });
-  if(q(".f-soc")) q(".f-soc").addEventListener("click",async e=>{ e.target.disabled=true; const socia={...(p.socia||{})}; if(socia[SOCIA_K]) delete socia[SOCIA_K]; else socia[SOCIA_K]={amount:SOCIA_AMOUNT,date:todayISO()}; await guardarPersona(pid,{socia},st); tras(); });
+  if(q(".f-soc")) q(".f-soc").addEventListener("click",async e=>{ const socia={...(p.socia||{})}; const quitar=!!socia[SOCIA_K];
+    if(quitar){ socia._casal=socia[SOCIA_K]; delete socia[SOCIA_K]; } else { socia[SOCIA_K]=socia._casal||{amount:SOCIA_AMOUNT,date:todayISO()}; delete socia._casal; }   /* al volver a marcar, conserva la fecha del alta (no se cobra dos veces a Loli) */
+    const hacer=async()=>{ e.target.disabled=true; await guardarPersona(pid,{socia},st); tras(); };
+    if(quitar) confirmar(q(".f-estado"), `¿Quitar el alta del Casal de ${p.name}? Dejará de contar para Loli.`, "Sí, quitar", hacer, true); else hacer(); });
   // al cerrar los datos se olvida la contraseña: cada vez que se abren se vuelve a pedir
   const cerrarDatos=(msg)=>{ f.dataset.datos=""; clauMem=""; fitxes=null; fitxesError=""; fitxesAviso=""; pintarFicha(f); if(msg){ const s2=f.querySelector(".f-status"); s2.textContent=msg; s2.className="status f-status ok"; } };
   if(q(".f-abrir")) q(".f-abrir").addEventListener("click",async()=>{ f.dataset.datos="1"; pintarFicha(f); if(fitxes===null && clauFichas()){ await cargarFitxes(); if(f.isConnected) pintarFicha(f); } });

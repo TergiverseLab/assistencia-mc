@@ -35,6 +35,8 @@ function explicarRegistro(r){
     else if((m=x.match(/^Baja: (.+)$/))){ quien=m[1]; det.push("Dada de baja (conserva su historial)"); }
     else if((m=x.match(/^Vuelve a estar activa: (.+)$/))){ quien=m[1]; det.push("Vuelve a estar activa"); }
     else if((m=x.match(/^Nombre cambiado: (.+) → (.+)$/))){ quien=m[2]; det.push(`Nombre corregido (antes: ${m[1]})`); }
+    else if((m=x.match(/^Alta del Casal: (.+) \((.*) €\)$/))){ quien=m[1]; det.push(`Alta del Casal pagada (${m[2]} €)`); }
+    else if((m=x.match(/^Alta del Casal quitada: (.+)$/))){ quien=m[1]; det.push("Alta del Casal desmarcada"); }
     else if((m=x.match(/^Socia (\S+): (.+) \((.*) €\)$/))){ quien=m[2]; det.push(m[1]==="hoja" ? "Hoja del Casal entregada" : `Alta del Casal pagada (${m[3]} €)`); }
     else if((m=x.match(/^Socia (\S+) quitada: (.+)$/))){ quien=m[2]; det.push(m[1]==="hoja" ? "Hoja del Casal desmarcada" : "Alta del Casal desmarcada"); }
     else if((m=x.match(/^Persona (.+): sin cambios$/))){ quien=m[1]; det.push("Guardada sin cambios"); }

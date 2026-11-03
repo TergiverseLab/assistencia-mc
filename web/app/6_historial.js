@@ -10,6 +10,7 @@ function textoPendiente(op){
   if(op.action==="deleteSession") return {titulo:"Asistencia", det:["Borrar el registro de asistencia del "+fmt(String(d.id).slice(0,10))]};
   if(op.action==="mes") return {titulo:`Cuotas · ${monthName(d.month)}`, det:[d.tancat?"Cerrar el mes":"Reabrir el mes"]};
   if(op.action==="persona"){ const st=d.set||{}, det=[]; if(st.active===false) det.push("Dar de baja"); if(st.active===true) det.push("Alta / vuelve a estar activa"); if(st.name) det.push("Nombre: "+st.name); if(st.socia) det.push("Alta del Casal (cambio)"); return {titulo:`Personas · ${nom(d.id)}`, det:det.length?det:["Cambios en la ficha"]}; }
+  if(op.action==="settings"){ const det=Object.keys(d||{}).filter(k=>/^loli:/.test(k)).map(k=>d[k]?`Entregado a Loli: ${monthName(k.slice(5))} · ${d[k].importe} €`:`Entrega a Loli anulada: ${monthName(k.slice(5))}`); return {titulo:"Loli", det:det.length?det:["Ajustes"]}; }
   return op.action;
 }
 function diaHist(t){ const d=new Date(t); if(isNaN(d)) return "";
@@ -35,8 +36,9 @@ function renderHistorial(){
     it.innerHTML=`<span class="ht">${esc(hh)}</span><span class="hx">${e.titulo?`<b>${esc(e.titulo)}</b>`:""}${e.det.map(d=>`<span class="hd">${esc(d)}</span>`).join("")}</span>`;
     it.addEventListener("click",()=>{
       if(r.accio==="sessio" && data.sessions[r.ref]){ show("lista"); setDate(data.sessions[r.ref].date||r.ref.slice(0,10), r.ref); }
+      else if(r.accio==="sessio" && /^\d{4}-\d{2}-\d{2}/.test(r.ref)){ show("lista"); setDate(r.ref.slice(0,10)); }
       else if((r.accio==="pagaments"||r.accio==="mes"||r.accio==="loli") && /^\d{4}-\d{2}$/.test(r.ref)){ curMonth=r.ref; show("pagos"); }
-      else if(r.accio==="persona" && data.persons[r.ref]){ show("pers"); const el=document.querySelector(`[data-ficha="${CSS.escape(r.ref)}"]`); if(el){ el.click(); el.scrollIntoView({block:"center"}); } }
+      else if(r.accio==="persona" && data.persons[r.ref]){ show("pers"); const el=document.querySelector(`[data-ficha="${CSS.escape(r.ref)}"]`); if(el){ if(!document.querySelector(`.ficha[data-pid="${CSS.escape(r.ref)}"]`)) el.click(); el.scrollIntoView({block:"center"}); } }
     });
     box.append(it);
   });

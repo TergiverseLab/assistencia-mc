@@ -79,7 +79,7 @@ function normalizar(j){
 }
 
 function SheetStore(url){
-  const QK="tdr-queue", CK="tdr-cache";
+  const QK="mc-queue", CK="mc-cache";   // claves propias: TdR y MC comparten dominio (tergiverselab.github.io)
   const ls = { get(k){ try{ return JSON.parse(localStorage.getItem(k)||"null"); }catch(e){ return null; } }, set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} } };
   const queue=()=>{ const q=ls.get(QK); return Array.isArray(q)?q.filter(o=>o&&o.action&&o.key):[]; };
   const setQueue=q=>ls.set(QK,q);
@@ -151,7 +151,7 @@ function SheetStore(url){
 }
 
 function LocalStore(){ // último recurso: solo este navegador
-  const K="tdr-data";
+  const K="mc-data";
   const read=()=>{ try{ return JSON.parse(localStorage.getItem(K)||"null")||{persons:{},sessions:{},pagos:{},settings:{},registre:[]}; }catch(e){ return {persons:{},sessions:{},pagos:{},settings:{},registre:[]}; } };
   return { name:"local", pending:()=>[], cached:()=>null, retry:async()=>{}, async load(){ return read(); },
     async send(op){ const d=read(); aplicarOp(d,op); try{ localStorage.setItem(K,JSON.stringify(d)); }catch(e){} return {}; } };

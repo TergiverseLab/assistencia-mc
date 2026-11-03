@@ -17,7 +17,7 @@ function mesesLoli(hasta){ const ms=new Set(Object.keys(data.pagos)); Object.val
 function renderLoli(){
   const box=$("p-loli"); if(!box) return;
   const hoyD=todayISO(), hoy=hoyD.slice(0,7);
-  if(curMonth<LOLI_DESDE){ box.innerHTML=`<h2>Loli · Casal de la Dona</h2><p class="note">En la T1 eran 30 € fijos al mes.</p>`; return; }
+  if(curMonth<LOLI_DESDE){ box.innerHTML=`<h2>Loli · Casal de la Dona</h2><p class="note">${curMonth>"2026-06"?"Julio y agosto: sin taller.":"En la T1 (febrero–junio 2026) eran 30 € fijos al mes."}</p>`; return; }
   // Plazo del Casal: lo de cada mes se paga en su oficina del 1 al 10 de ESE mes.
   const limite=m=>m+"-10", tarde=m=>hoyD>limite(m), diaLim=m=>`10 de ${MESES[+m.slice(5,7)-1]}`;
   const yaEnt=x=>Number(x.entregado&&x.entregado.importe)||0, falta=x=>r2(Math.max(0,x.total-yaEnt(x)));
@@ -26,8 +26,9 @@ function renderLoli(){
   const totalPend=r2(pend.reduce((a,x)=>a+falta(x),0)), algunoTarde=pend.some(x=>tarde(x.mes));
   // Última entrega (todos los meses marcados el mismo día): se puede deshacer por si se marcó sin haber pagado
   const ents=Object.entries(data.settings||{}).filter(([k,v])=>/^loli:\d{4}-\d{2}$/.test(k)&&v&&v.data);
-  const ultData=ents.map(([k,v])=>v.data).sort().pop();
-  const ultE=ultData?ents.filter(([k,v])=>v.data===ultData):[];
+  const sello=v=>v.ts||v.data;   /* cada entrega lleva su hora: dos entregas del mismo día no se mezclan */
+  const ultSello=ents.map(([k,v])=>sello(v)).sort().pop();
+  const ultE=ultSello?ents.filter(([k,v])=>sello(v)===ultSello):[]; const ultData=ultE.length?ultE[0][1].data:null;
   const ult=ultData?{data:ultData, meses:ultE.map(([k])=>k.slice(5)).sort(), total:r2(ultE.reduce((a,[k,v])=>a+(Number(v.importe)||0)-(Number(v.antes&&v.antes.importe)||0),0)), ents:ultE}:null;
   const estadoMes = falta(v)===0&&v.entregado ? `${CANDADO}<b>Entregado</b>${v.entregado.data?" el "+esc(fmt(v.entregado.data)):""}`
                   : v.total===0 ? "" : tarde(curMonth) ? `<b class="tarde">Fuera de plazo</b>: se tenía que entregar antes del ${diaLim(curMonth)}.` : `Se entrega en el Casal antes del <b>${diaLim(curMonth)}</b>.`;
@@ -57,7 +58,7 @@ function renderLoli(){
   });
   const b=$("lp-entregar"); if(b) b.addEventListener("click",()=>{
     confirmar(b, `¿Has entregado ${eur(totalPend)} a Loli? Quedará apuntado como entregado (${pend.map(x=>monthName(x.mes)).join(", ")}), con fecha de hoy.`, "Sí, entregado", async()=>{
-      const set={}; pend.forEach(x=>{ const e=x.entregado; set["loli:"+x.mes]={data:hoyD, importe:x.total, ...(e&&e.importe?{antes:{data:e.data,importe:e.importe}}:{})}; });
+      const set={}; pend.forEach(x=>{ const e=x.entregado; set["loli:"+x.mes]={data:hoyD, ts:new Date().toISOString(), importe:x.total, ...(e&&e.importe?{antes:e}:{})}; });
       const op={action:"settings", key:"c:loli", data:set}; aplicarOp(data,op); renderLoli(); updPendientes();
       try{ await store.send(op); }catch(e){ setStatus("p-status","La hoja ha rechazado el cambio: "+e.message,"err"); refresh(); }
       renderLoli(); updPendientes();

@@ -23,16 +23,18 @@ function tablasCtx(){
   const nm=k=>(data.persons[k]||{name:k}).name; const r1=v=>Math.round(v*10)/10;
   const ids=Object.keys(data.sessions).filter(inCtxSession).sort((a,b)=>(data.sessions[a].date||a).localeCompare(data.sessions[b].date||b)||a.localeCompare(b));
   const gente=new Set(); ids.forEach(id=>data.sessions[id].present.forEach(p=>gente.add(p)));
-  const months=Object.keys(data.pagos).filter(inCtxMonth).sort();
+  const hoyM=todayISO().slice(0,7), months=Object.keys(data.pagos).filter(m=>inCtxMonth(m)&&m<=hoyM).sort();   // como el Resumen: hasta el mes en curso
+  const adelantado=Object.keys(data.pagos).filter(m=>inCtxMonth(m)&&m>hoyM).reduce((a,m)=>a+Object.values(data.pagos[m].rows||{}).reduce((b,x)=>b+(Number(x.amount)||0),0),0);
   if(ctx.group==="all") months.forEach(m=>Object.keys(data.pagos[m].rows||{}).forEach(p=>gente.add(p)));
+  if(ctx.season===curSeasonKey()) activePersons().forEach(p=>gente.add(p.id));   // apuntadas, como en el Resumen
   const asis=ids.map(id=>sesAsistencia(id,ctx.group)).filter(v=>v!=null); const media=asis.length?asis.reduce((a,b)=>a+b,0)/asis.length:0;
   const probes=new Set(); ids.forEach(id=>(data.sessions[id].others||[]).forEach(o=>probes.add(o.toLowerCase())));
   const conLista=ids.filter(sesConLista); const counts={}; conLista.forEach(id=>data.sessions[id].present.forEach(k=>counts[k]=(counts[k]||0)+1));
   const pagRows=m=>{ const rows=data.pagos[m].rows||{}; return Object.keys(rows).filter(p=>ctx.group==="all"||gente.has(p)); };
   // Resumen
   const resum=[["Taller de Moviment Creatiu · "+etiquetaCtx()],[],
-    ["Sesiones",ids.length],["Participantes",gente.size],["Media de asistentes por sesión",r1(media)],["Personas que vinieron a probar",probes.size]];
-  if(months.length){ resum.push([],["Mes","Inscritas","Cuotas (€)"]); months.forEach(m=>{ const ps=pagRows(m); resum.push([monthName(m),ps.length,ps.reduce((a,p)=>a+(data.pagos[m].rows[p].amount||0),0)]); }); }
+    ["Sesiones",ids.length],["Personas apuntadas",gente.size],["Media de asistentes por sesión",r1(media)],["Personas que vinieron a probar",probes.size]];
+  if(months.length){ resum.push([],["Mes","Inscritas","Cuotas (€)"]); months.forEach(m=>{ const ps=pagRows(m); resum.push([monthName(m),ps.length,ps.reduce((a,p)=>a+(data.pagos[m].rows[p].amount||0),0)]); }); if(adelantado) resum.push(["Ya pagado por adelantado (meses que vienen)","",adelantado]); }
   resum.push([],["Descargado el "+fmt(todayISO())+" desde la web de asistencia"]);
   // Sesiones
   const conGrupo=ids.some(id=>data.sessions[id].group);
