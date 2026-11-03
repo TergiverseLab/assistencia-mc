@@ -213,7 +213,7 @@ function instalar(){
 // Cada mes: cuotas cobradas, 15 % + altas del Casal = lo que hay que entregarle, y si ya se entregó (Config: loli:AAAA-MM)
 function vistaLoli(m){
   const sh = vista("Loli");
-  titol(sh, "Loli · Casal de la Dona", "Des de setembre de 2026: 15 % de les quotes de cada mes + 20 € per cada alta del Casal. T1: 30 € fixos al mes.");
+  titol(sh, "Loli · Casal de la Dona", "Des de setembre de 2026: 15 % de les quotes de cada mes + 20 € per cada alta del Casal. Es paga a l'oficina del Casal de l'1 al 10 de cada mes. T1: 30 € fixos al mes.");
   const cfg = {}; rows("settings").filter(r=>r[0]).forEach(r=>{ try{ cfg[String(r[0])] = JSON.parse(r[1]); }catch(e){ cfg[String(r[0])] = r[1]; } });
   const mesos = [...new Set(m.pagos.map(p=>p.mes))].filter(mm=>mm <= m.avui.slice(0,7)).sort();
   const altes = mm => Object.values(m.persons).filter(p=>p.socia && p.socia.casal && String(p.socia.casal.date||"").slice(0,7)===mm);
@@ -222,7 +222,7 @@ function vistaLoli(m){
   const files = mesos.map(mm=>{
     const q = m.pagos.filter(p=>p.mes===mm).reduce((a,p)=>a+p.imp,0); const al = altes(mm);
     const tot = loliMes(mm, q, al.length); const lli = cfg["loli:"+mm];
-    const pendent = lli ? 0 : tot; if (mm >= LOLI_DES_DE) pend += pendent;
+    const pendent = Math.max(0, Math.round((tot - (lli ? Number(lli.importe)||0 : 0))*100)/100);   // si se entregó y luego entraron más cuotas, falta la diferencia if (mm >= LOLI_DES_DE) pend += pendent;
     return [nomMes(mm), q, mm >= LOLI_DES_DE ? tot - 20*al.length : tot, al.length ? al.length + " × 20 € (" + al.map(p=>p.nom).join(", ") + ")" : "", tot,
             lli ? "✓ " + (lli.data ? dmy(lli.data) : "") : (mm < LOLI_DES_DE ? "(T1)" : ""), mm < LOLI_DES_DE ? "" : pendent || ""];
   });
