@@ -266,3 +266,5 @@ footer .note,#ver{color:rgba(255,255,255,.8)}
 .loli-pend.atr{background:#F6DCD3}
 .loli-pend .lp-tit .tarde{text-transform:none;letter-spacing:0}
 .loli-pend:not(.atr):not(.cero) .lp-num{color:var(--fg)}
+
+.pay .name small.aviso{color:#8a5a00;font-weight:600}
