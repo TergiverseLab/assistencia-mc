@@ -59,4 +59,10 @@ $("n-add").addEventListener("click",async()=>{
   if(ya){ await guardarPersona(id,{active:true,to:""}); setStatus("n-status",`${ya.name} vuelve a estar activa.`,"ok"); }
   else { await guardarPersona(id,{name,active:true,from:todayISO().slice(0,7),to:""}); setStatus("n-status",`Alta de ${name}.`,"ok"); }
   $("n-add").disabled=false; $("n-name").value=""; renderPersons(); renderRoster();
+  // Persona nueva (o que vuelve sin alta): preguntar por el alta del Casal, que va íntegra a Loli
+  const p=data.persons[id];
+  if(p && !isSocia(p)) confirmar($("n-add").closest(".row"), `¿${p.name} ha pagado el alta del Casal de la Dona (${SOCIA_AMOUNT} €)?`, "Sí, apuntar", async()=>{
+    const socia={...(p.socia||{})}; socia[SOCIA_K]=socia._casal||{amount:SOCIA_AMOUNT,date:todayISO()}; delete socia._casal;
+    await guardarPersona(id,{socia}); renderPersons(); setStatus("n-status",`Alta de ${p.name} · alta del Casal apuntada (${SOCIA_AMOUNT} €, para Loli).`,"ok");
+  }, false, ()=>setStatus("n-status",`Alta de ${p.name}. Cuando pague el alta del Casal, pulsa «Casal» junto a su nombre.`,"ok"));
 });
