@@ -60,10 +60,12 @@ function renderPagos(){
   const abiertoTemp=abiertos.has("m:"+curMonth);
   $("p-lockrow").hidden = !mesRegistrado(curMonth);
   $("p-lock").textContent = abiertoTemp ? "Cancelar corrección" : "Corregir cuotas";
+  $("p-borrar").hidden = abiertoTemp;
   $("p-lockmsg").textContent = abiertoTemp ? "Cambia lo que haga falta y pulsa Guardar." : "";
   $("p-default").disabled = locked; $("p-defaultwrap").hidden = past || locked;
   const personas=payPersons(curMonth);
   if(!personas.length){ list.innerHTML='<p class="empty">No consta ningún pago en este mes.</p>'; }
+  if(past && !mesRegistrado(curMonth) && personas.length){ const e=document.createElement("p"); e.className="empty"; e.textContent=`${cap(monthName(curMonth))}: sin cuotas registradas. Si alguien pagó, márcalo y pulsa Guardar.`; list.append(e); }
   personas.forEach(p=>{
     const r=rows[p.id]; const div=document.createElement("div"); div.className="pay"+(mesRegistrado(curMonth) && !r && curMonth<=thisM ? " falta" : "");   // mes registrado: quien no ha pagado, en rojo
     div.innerHTML=`<div class="name">${esc(p.name)}<small>${p.active===false?"(baja) ":""}${r&&r.date?"pagado "+esc(fmt(r.date)):(curMonth>thisM?"":"pendiente")}</small></div>
@@ -135,3 +137,19 @@ async function savePagos(){
   if(aviso && !error && curMonth===month) setStatus("p-status", aviso, "err");
   updPendientes();
 }
+
+// Eliminar el registro de cuotas de un mes entero (como en Asistencia): se quitan todos los pagos del mes,
+// el mes deja de constar como registrado y queda en el Historial. Va por la misma operación que «desmarcar».
+$("p-borrar").addEventListener("click",()=>{
+  const m=curMonth; const rows=(data.pagos[m]||{rows:{}}).rows||{}; const ids=Object.keys(rows); if(!ids.length) return;
+  const total=ids.reduce((a,k)=>a+(Number(rows[k].amount)||0),0);
+  const loli=(data.settings||{})["loli:"+m]; const avisoLoli = loli ? " Ojo: este mes ya consta como entregado a Loli." : "";
+  confirmar($("p-lockrow"), `¿Estás seguro de eliminar el registro de cuotas de ${monthName(m)}? Se quitan ${ids.length} ${ids.length===1?"pago":"pagos"} (${total} €) y el mes queda sin cuotas.${avisoLoli}`, "Sí, eliminar", async()=>{
+    const op={action:"pagaments", key:"m:"+m, data:{month:m, set:{}, unset:ids, nous:[]}};
+    aplicarOp(data,op); abiertos.delete("m:"+m); clearPagDraft(m); renderPagos(); setStatus("p-status","Registro de cuotas eliminado.","ok"); updPendientes();
+    try{ const res=await store.send(op); if(res.encola) setStatus("p-status","Registro de cuotas eliminado. "+textoEspera(),"ok");
+      else if(res.pagos){ data.pagos[m]={month:m, rows:res.pagos.rows}; if(curMonth===m) renderPagos(); } }
+    catch(e){ setStatus("p-status","La hoja ha rechazado el borrado: "+e.message,"err"); refresh(); }
+    updPendientes();
+  }, true);
+});

@@ -8,6 +8,7 @@ const todayISO = () => { const d=new Date(); d.setMinutes(d.getMinutes()-d.getTi
 const fmt = iso => { const [y,m,d]=String(iso).slice(0,10).split("-"); return `${d}/${m}/${y}`; };
 const MESES=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
 const DIAS=["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
+const cap = s => s ? s[0].toUpperCase()+s.slice(1) : s;
 const monthName = ym => { const [y,m]=ym.split("-"); return `${MESES[+m-1]} ${y}`; };
 const shortMonth = ym => { const [y,m]=ym.split("-"); return MESES[+m-1].slice(0,3)+" "+y.slice(2); };
 const esc = s => String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
