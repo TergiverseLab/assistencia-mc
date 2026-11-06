@@ -73,7 +73,13 @@ function renderSummary(){
   const adel=Object.entries(porPersona).map(([pid,v])=>`${esc((data.persons[pid]||{name:pid}).name)}, de ${monthName(v.ms[0])} a ${monthName(v.ms[v.ms.length-1])} (${v.t} €)`);
   $("r-adelantado").hidden=!adel.length; $("r-adelantado").innerHTML=adel.length?`<b>Ya pagado por adelantado</b> · ${adel.join(" · ")}`:"";
   const tp=$("r-pagos").querySelector("tbody"); tp.innerHTML="";
-  const mi=months.map(m=>{ const rows=data.pagos[m].rows||{}; const t=Object.values(rows).reduce((a,x)=>a+(x.amount||0),0); const tr=document.createElement("tr"); tr.innerHTML=`<td>${monthName(m)}</td><td class="n">${Object.keys(rows).length}</td><td class="n">${t} €</td>`; tp.append(tr); return {label:shortMonth(m),short:MESES[+m.slice(5,7)-1].slice(0,3),value:t}; });
+  // Parte de Loli que sale de las cuotas: desde septiembre de 2026, el 15 %; en la T1 (feb–jun 2026), 30 € fijos.
+  // Las altas del Casal (20 €) no salen de las cuotas: van aparte, en la línea de debajo.
+  const loliMes=(m,t)=> m>=LOLI_DESDE ? r2(t*LOLI_PCT) : (t>0 ? Math.min(30,t) : 0);
+  let sT=0, sL=0, sP=0;
+  const mi=months.map(m=>{ const rows=data.pagos[m].rows||{}; const t=Object.values(rows).reduce((a,x)=>a+(Number(x.amount)||0),0); const l=loliMes(m,t), ti=r2(t-l); sT+=t; sL+=l; sP+=ti;
+    const tr=document.createElement("tr"); tr.innerHTML=`<td>${cap(MESES[+m.slice(5,7)-1].slice(0,3))} ${m.slice(2,4)}</td><td class="n">${Object.keys(rows).length}</td><td class="n">${eur(t)}</td><td class="n">${eur(l)}</td><td class="n"><b>${eur(ti)}</b></td>`; tp.append(tr); return {label:shortMonth(m),short:MESES[+m.slice(5,7)-1].slice(0,3),value:t}; });
+  $("r-pagos").querySelector("tfoot").innerHTML = months.length>1 ? `<tr><th>Total</th><th></th><th class="n">${eur(sT)}</th><th class="n">${eur(r2(sL))}</th><th class="n">${eur(r2(sP))}</th></tr>` : "";
   bars($("r-chart-pag"), mi, v=>v+" €");
   const altas=Object.values(data.persons).filter(p=>isSocia(p)&&(p.socia.casal.date?inCtxMonth(String(p.socia.casal.date).slice(0,7)):ctx.season==="all"));   // solo las altas pagadas en la temporada que se mira
   $("r-socias").hidden=!altas.length;
