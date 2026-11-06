@@ -132,9 +132,17 @@ function diaInicial(){ const d=new Date(todayISO()+"T12:00:00"); d.setDate(d.get
 $("l-prevw").addEventListener("click",()=>shiftWed(-1)); $("l-nextw").addEventListener("click",()=>shiftWed(1));
 $("l-date").addEventListener("change",()=>{ if($("l-date").value) setDate($("l-date").value); });
 
-async function saveSession(){
+async function saveSession(seguro){
   const date=$("l-date").value; if(!date){ setStatus("l-status","Falta la fecha.","err"); return; }
   if(isSesLocked(curSessionId)) return;
+  // Antes de crear una sesión: avisar si está vacía o si la fecha aún no ha llegado (bajaría la media del Resumen)
+  if(!seguro && !(curSessionId&&data.sessions[curSessionId])){
+    const vacia=!checked().length && !others().length, futura=date>todayISO();
+    if(vacia||futura){ const dia=`${DIAS[new Date(date+"T12:00:00").getDay()]} ${fmt(date)}`;
+      const txt = futura&&vacia ? `El ${dia} todavía no ha llegado y no has marcado a nadie. ¿Guardar igualmente?`
+                : futura ? `El ${dia} todavía no ha llegado. ¿Guardar la asistencia igualmente?`
+                : `No has marcado a nadie. ¿Guardar la sesión del ${dia} con 0 personas?`;
+      confirmar($("l-acciones"), txt, "Sí, guardar", ()=>saveSession(true), true); return; } }
   const sid=curSessionId||date; const prev=data.sessions[sid];
   const ahora=checked(); const base=baseSes.present;
   const op={action:"sessio", key:"s:"+sid, data:{id:sid, date, group:prev?prev.group||"":"", add:ahora.filter(p=>!base.includes(p)), remove:base.filter(p=>!ahora.includes(p)),

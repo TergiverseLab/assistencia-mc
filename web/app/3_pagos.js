@@ -59,6 +59,7 @@ function renderPagos(){
   const list=$("p-list"); list.innerHTML="";
   const abiertoTemp=abiertos.has("m:"+curMonth);
   $("p-lockrow").hidden = !mesRegistrado(curMonth);
+  $("p-lock").hidden = !past;   // «Corregir cuotas» solo en meses pasados; el mes en curso no se cierra
   $("p-lock").textContent = abiertoTemp ? "Cancelar corrección" : "Corregir cuotas";
   $("p-borrar").hidden = abiertoTemp;
   $("p-lockmsg").textContent = abiertoTemp ? "Cambia lo que haga falta y pulsa Guardar." : "";
@@ -67,7 +68,7 @@ function renderPagos(){
   if(!personas.length){ list.innerHTML='<p class="empty">No consta ningún pago en este mes.</p>'; }
   if(past && !mesRegistrado(curMonth) && personas.length){ const e=document.createElement("p"); e.className="empty"; e.textContent=`${cap(monthName(curMonth))}: sin cuotas registradas. Si alguien pagó, márcalo y pulsa Guardar.`; list.append(e); }
   personas.forEach(p=>{
-    const r=rows[p.id]; const div=document.createElement("div"); div.className="pay"+(mesRegistrado(curMonth) && !r && curMonth<=thisM ? " falta" : "");   // mes registrado: quien no ha pagado, en rojo
+    const r=rows[p.id]; const div=document.createElement("div"); div.className="pay"+(mesRegistrado(curMonth) && !r && past ? " falta" : "");   // mes pasado registrado: quien no pagó, en rojo (el mes en curso, aún no)
     div.innerHTML=`<div class="name">${esc(p.name)}<small>${p.active===false?"(baja) ":""}${r&&r.date?"pagado "+esc(fmt(r.date)):(curMonth>thisM?"":"pendiente")}</small></div>
       <input type="number" inputmode="decimal" min="0" step="1" value="${esc(r?r.amount:defAmount())}" class="${r?"":"dim"}" aria-label="Importe ${esc(p.name)}" data-id="${esc(p.id)}" ${locked?"disabled":""}>
       <button class="tog ${r?"on":""}" type="button" data-id="${esc(p.id)}" aria-pressed="${!!r}" aria-label="Pagado ${esc(p.name)}" ${locked?"disabled":""}>${r?"✓":"○"}</button>`;
@@ -110,7 +111,8 @@ function lineaPagos(estado){
     return; }
   const ult=Object.values(rows).map(r=>r.savedAt||"").sort().pop();
   if(abiertos.has("m:"+curMonth)){ el.innerHTML=`${CANDADO_ABIERTO}<b>Corrigiendo</b>`; el.className="saved reg"; return; }
-  if(mesRegistrado(curMonth)){ el.innerHTML=`${CANDADO}<b>Registradas</b>${ult?" · "+esc(hora(ult)):""}`; el.className="saved reg"; return; }
+  if(mesRegistrado(curMonth) && curMonth<todayISO().slice(0,7)){ el.innerHTML=`${CANDADO}<b>Registradas</b>${ult?" · "+esc(hora(ult)):""}`; el.className="saved reg"; return; }
+  if(mesRegistrado(curMonth)){ el.textContent=`Guardadas${ult?" · "+hora(ult):""}. Puedes seguir marcando cuotas de este mes.`; el.className="saved ok"; return; }
   el.textContent=""; el.className="saved";
 }
 function updTotal(){ const {ui,soc}=estadoPantalla(); const on=Object.values(ui).filter(u=>u.on); let t=on.reduce((a,u)=>a+(u.amount>0?u.amount:defAmount()),0); const ns=Object.keys(soc).length; t+=Object.values(soc).reduce((a,v)=>a+v,0);

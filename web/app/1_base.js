@@ -45,7 +45,8 @@ const sesAsistencia = (k, grupo) => { const v=sesAsisDirecta(k); if(v!=null) ret
 const abiertos=new Set();
 // Cuotas igual que Asistencia: un mes con cuotas ya guardadas queda REGISTRADO (candado); se toca con "Corregir cuotas".
 const mesRegistrado = month => !!(data.pagos[month] && Object.keys(data.pagos[month].rows||{}).length);
-const isLocked = month => !abiertos.has("m:"+month) && mesRegistrado(month);
+// Candado solo en meses pasados: el mes en curso (y los futuros, pagados por adelantado) siguen abiertos para ir marcando cuotas
+const isLocked = month => month<todayISO().slice(0,7) && !abiertos.has("m:"+month) && mesRegistrado(month);
 // candado cerrado (registrado) / abierto (corrigiendo)
 const CANDADO='<svg class="candado" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
 const CANDADO_ABIERTO='<svg class="candado" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 7.6-1.8"/></svg>';
