@@ -11,6 +11,14 @@ import { Niveles } from './niveles.js';
 import { Grabadora, guardar } from './grabar.js';
 
 const $ = (s) => document.querySelector(s);
+const VERSION = 'v1.1';
+// cualquier error queda escrito en pantalla, nunca en silencio
+const mostrarError = (m) => { const t = 'error: ' + m; const e = document.querySelector('#estado'), a = document.querySelector('#aviso'); if (e) e.textContent = t; if (a) { a.textContent = t; a.hidden = false; } };
+addEventListener('error', (e) => mostrarError(e.message));
+addEventListener('unhandledrejection', (e) => mostrarError(e.reason && e.reason.message || e.reason));
+// el toque responde desde el primer instante: si la app aún se prepara, empieza en cuanto esté
+let preparada; const listo = new Promise((r) => { preparada = r; });
+document.querySelector('#pr').onclick = () => { avisar('un momento…'); listo.then(empezar); };
 const OJOS = { escena: 'escena · 150 cosas (SegFormer)', objetos: 'objetos · 80 cosas (CenterNet)' };
 const ajustes = cargarAjustes();
 function cargarAjustes() {
@@ -136,16 +144,18 @@ async function alternarGrabacion() {
 }
 
 async function iniciar() {
-  try { await Promise.all(['normal 400', 'normal 700', 'italic 400', 'italic 700'].map((s) => document.fonts.load(`${s} 40px "Courier Prime"`))); } catch (e) {}
-  try { lienzo = new Lienzo(canvas); } catch (e) { avisar(e.message); return; }
+  // las letras: se esperan como mucho 3 s; si tardan más, se sigue (el atlas se rehace cuando lleguen)
+  const fuentes = Promise.all(['normal 400', 'normal 700', 'italic 400', 'italic 700'].map((s) => document.fonts.load(`${s} 40px "Courier Prime"`)));
+  let llegaron = false; await Promise.race([fuentes.then(() => { llegaron = true; }), new Promise((r) => setTimeout(r, 3000))]).catch(() => {});
+  try { lienzo = new Lienzo(canvas); } catch (e) { mostrarError(e.message); return; }
   const atlas = crearAtlas(TODAS.join(''));
   lienzo.atlas(atlas); prepararPalabras(atlas);
+  if (!llegaron) fuentes.then(() => lienzo.atlas(crearAtlas(TODAS.join('')))).catch(() => {});
   grabadora = new Grabadora(canvas);
   aplicar(); dimensionar();
   addEventListener('resize', dimensionar);
   for (const [k, v] of Object.entries(OJOS)) { const o = document.createElement('option'); o.value = k; o.textContent = v; $('#ojo').append(o); }
   $('#ojo').value = ajustes.ojo;
-  $('#pr').onclick = empezar;
   $('#grabar').onclick = alternarGrabacion;
   $('#girar').onclick = () => camara.girar();
   $('#ajustes-boton').onclick = () => { $('#cfgP').hidden = !$('#cfgP').hidden; };
@@ -159,6 +169,8 @@ async function iniciar() {
   $('#ver').onchange = (e) => { ajustes.ver = e.target.checked; $('#st').hidden = !ajustes.ver; guardarAjustes(); };
   $('#st').hidden = !ajustes.ver;
   if (!window.isSecureContext) avisar('hace falta abrir esta página con https:// para usar la cámara');
+  $('#version').textContent = VERSION;
+  preparada();
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
 }
 iniciar();
