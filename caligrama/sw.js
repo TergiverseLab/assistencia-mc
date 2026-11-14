@@ -1,16 +1,17 @@
-// sw.js — guarda la app y los modelos en el móvil: después de la primera vez, abre sin esperar y sin red.
-const CACHE = 'caligrama-v0-3';
-const ARCHIVOS = ['./', 'index.html', 'estilo.css', 'manifest.webmanifest', 'icono.svg', 'icono-512.png',
-  'js/main.js', 'js/tipos.js', 'js/relatos.js', 'js/render.js', 'js/nombrar.js', 'js/vision.js', 'js/escritura.js', 'js/camara.js', 'js/grabar.js', 'js/vocab.js',
-  'vendor/human.esm.js', 'vendor/courier-prime-latin-400-normal.woff2', 'vendor/courier-prime-latin-700-normal.woff2', 'vendor/courier-prime-latin-400-italic.woff2', 'vendor/courier-prime-latin-700-italic.woff2',
-  'modelos/centernet.json', 'modelos/centernet.bin', 'modelos/selfie.json', 'modelos/selfie.bin'];
-self.addEventListener('install', (e) => e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ARCHIVOS)).then(() => self.skipWaiting())));
-self.addEventListener('activate', (e) => e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim())));
-// primero la red (así cada cambio llega al momento); si no hay red, lo guardado
+// sw.js — la app guardada en el móvil.
+//  · lo pequeño (páginas, código): primero la red, para que cada cambio llegue al momento; sin red, lo guardado;
+//  · lo grande (motor y modelos en vendor/ y modelos/): primero lo guardado, para no descargarlo dos veces.
+// Los pesos del ojo que vienen de Hugging Face los guarda segmentar.js en su propia caché.
+const CACHE = 'caligrama-v1-0', MODELOS = 'caligrama-modelos';
+const BASICOS = ['./', 'index.html', 'estilo.css', 'manifest.webmanifest', 'icono.svg', 'icono-512.png'];
+self.addEventListener('install', (e) => e.waitUntil(caches.open(CACHE).then((c) => c.addAll(BASICOS)).then(() => self.skipWaiting())));
+self.addEventListener('activate', (e) => e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== CACHE && k !== MODELOS).map((k) => caches.delete(k)))).then(() => self.clients.claim())));
 self.addEventListener('fetch', (e) => {
-  if (e.request.method !== 'GET') return;
-  e.respondWith(fetch(e.request).then((r) => {
-    if (r.ok) { const copia = r.clone(); caches.open(CACHE).then((c) => c.put(e.request, copia)); }
-    return r;
-  }).catch(() => caches.match(e.request)));
+  const url = new URL(e.request.url);
+  if (e.request.method !== 'GET' || url.origin !== location.origin) return;
+  const grande = /\/(vendor|modelos)\//.test(url.pathname);
+  const guardar = (r) => { if (r.ok) { const copia = r.clone(); caches.open(CACHE).then((c) => c.put(e.request, copia)); } return r; };
+  e.respondWith(grande
+    ? caches.match(e.request).then((r) => r || fetch(e.request).then(guardar))
+    : fetch(e.request).then(guardar).catch(() => caches.match(e.request)));
 });

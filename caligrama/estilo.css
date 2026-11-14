@@ -51,3 +51,7 @@ button { font: 11px/1.5 sans-serif; color: #333; background: #fff; border: 1px s
 #revisar .botones { display: flex; gap: 10px; align-items: center; }
 #revisar .botones .sv { margin-top: 0; }
 #nota { min-height: 1.6em; font: italic 12px/1.8 Georgia, serif; color: #555; }
+#cfgP select { width: 100%; padding: 4px 6px; border: 1px solid #ddd; font: 11px sans-serif; background: #fff; color: #333; }
+/* mientras el ojo se carga: el aviso, como los mensajes del bosque */
+#aviso { position: fixed; top: max(14px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); z-index: 42; pointer-events: none;
+  font: italic 12px/1.6 Georgia, serif; color: #555; background: rgba(255, 255, 255, .9); padding: 2px 10px; max-width: 86vw; text-align: center; }
