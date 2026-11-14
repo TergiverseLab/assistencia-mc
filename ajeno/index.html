@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#ffffff">
+<title>Fotograma ajeno</title>
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+<video id="video" playsinline muted></video>
+<canvas id="lienzo"></canvas>
+<video id="miniatura" playsinline muted autoplay></video>
+
+<div id="ov"><div id="pr">
+<div class="informe">informe de sustitución — lo que miras ya fue fotografiado</div>
+fotograma ajeno<span>toca para abrir la cámara</span>
+<p id="estado"></p>
+<div id="version"></div>
+</div></div>
+
+<div id="aviso" hidden></div>
+<div id="credito"></div>
+<pre id="st" hidden></pre>
+<div id="tiempo" hidden>0:00</div>
+
+<nav id="mandos" hidden>
+  <button id="girar" aria-label="cambiar de cámara">⇄</button>
+  <button id="modo">forma</button>
+  <button id="grabar" aria-label="grabar"><span></span></button>
+  <button id="ajustes-boton" aria-label="ajustes">⚙</button>
+</nav>
+
+<div id="cfgP" hidden>
+  <label class="fila"><input id="mini" type="checkbox" checked> ver la cámara en pequeño</label>
+  <div class="n">la miniatura no sale en la grabación</div>
+  <label class="fila"><input id="ver" type="checkbox"> mostrar datos</label>
+</div>
+
+<div id="revisar" hidden>
+  <video controls playsinline loop></video>
+  <div class="botones"><button id="descartar">descartar</button><button id="guardar" class="sv">guardar</button></div>
+  <p id="nota"></p>
+</div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
