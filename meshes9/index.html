@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Meshes · la película construye un mundo</title>
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+<canvas id="lienzo"></canvas>
+<div id="ov"><div id="pr">
+<div class="informe">prototipo v0.9 · caleidoscopio</div>
+Meshes of the Afternoon<span>dentro del fotograma</span>
+<button id="elegir" class="grande">elegir la película (.mp4)</button>
+<div class="n">A partir de «Let Forever Be» (Michel Gondry). La película se reproduce sin parar y cada plano se convierte en un caleidoscopio que te rodea: seis copias del fotograma, alternando con su reflejo, cierran los 360°. Las figuras se repiten en cada sector, cada una con un poco más de retraso, y el movimiento da la vuelta a tu alrededor. Camina por dentro; en cada corte se construye el plano siguiente alrededor de donde estés.</div>
+<p id="estado"></p>
+</div></div>
+<input id="archivo" type="file" accept="video/*" hidden>
+<div id="hud" hidden></div>
+<div id="aviso"></div>
+<div id="reproductor" hidden><div id="barra"><div id="barra-dentro"></div></div><span id="t"></span></div>
+<div id="ayuda" hidden>clic: capturar el ratón · ratón: mirar · WASD: caminar · Mayús: deprisa<br>espacio: play / pausa · rueda del ratón o Z / X: atrás / adelante · clic en la barra: ir a ese momento<br>K: número de sectores (6 · 12 · 4 · 2) · Q / E: menos / más retraso entre ecos · R: centrar el caleidoscopio aquí · 1–5: datamosh · H: ocultar ayuda</div>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
