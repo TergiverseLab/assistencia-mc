@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Meshes · dentro del fotograma</title>
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+<canvas id="lienzo"></canvas>
+<div id="ov"><div id="pr">
+<div class="informe">prototipo · la película como espacio</div>
+Meshes of the Afternoon<span>dentro del fotograma</span>
+<button id="elegir" class="grande">elegir la película (.mp4)</button>
+<div class="n">quieto: la película. Al moverte, el fotograma se abre y caminas por él; lo que la cámara no vio se arrastra en datamosh. Al pararte, la película vuelve.</div>
+<p id="estado"></p>
+</div></div>
+<input id="archivo" type="file" accept="video/*" hidden>
+<div id="hud" hidden></div>
+<div id="ayuda" hidden>clic: capturar el ratón · WASD / flechas: caminar · ratón: mirar · Q/E: bajar/subir · Mayús: deprisa<br>1–5: cuánto datamosh · R: volver al origen · H: ocultar esta ayuda</div>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
