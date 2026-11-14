@@ -13,11 +13,14 @@
 <video id="miniatura" playsinline muted autoplay></video>
 
 <div id="ov"><div id="pr">
-<div class="informe">informe de sustitución — lo que miras ya fue fotografiado</div>
-fotograma ajeno<span>toca para abrir la cámara</span>
+<div class="informe">informe de sustitución — lo que miras ya fue filmado</div>
+fotograma ajeno
+<button id="pelicula" class="grande">elegir una película del móvil</button>
+<button id="internet" class="otra">o usar fotos de internet</button>
 <p id="estado"></p>
 <div id="version"></div>
 </div></div>
+<input id="archivo" type="file" accept="video/*" multiple hidden>
 
 <div id="aviso" hidden></div>
 <div id="credito"></div>
@@ -26,12 +29,14 @@ fotograma ajeno<span>toca para abrir la cámara</span>
 
 <nav id="mandos" hidden>
   <button id="girar" aria-label="cambiar de cámara">⇄</button>
-  <button id="modo">forma</button>
+  <button id="mas">+ película</button>
   <button id="grabar" aria-label="grabar"><span></span></button>
   <button id="ajustes-boton" aria-label="ajustes">⚙</button>
 </nav>
 
 <div id="cfgP" hidden>
+  <label>memoria: <span id="memoria-n">12</span> fotogramas</label><input id="memoria" type="range" min="0" max="60" step="1" value="12">
+  <div class="n">no repetir una imagen usada en los últimos N fotogramas · 0 = siempre la más parecida</div>
   <label class="fila"><input id="mini" type="checkbox" checked> ver la cámara en pequeño</label>
   <div class="n">la miniatura no sale en la grabación</div>
   <label class="fila"><input id="ver" type="checkbox"> mostrar datos</label>

@@ -29,7 +29,7 @@ button { font: 11px/1.5 sans-serif; color: #333; background: #fff; border: 1px s
 #mandos { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; display: flex; justify-content: space-around; align-items: center;
   padding: 12px 14px max(16px, env(safe-area-inset-bottom)); pointer-events: none; }
 #mandos > button { pointer-events: auto; width: 44px; height: 44px; padding: 0; font-size: 18px; border-radius: 50%; background: rgba(255, 255, 255, .9); }
-#mandos > #modo { width: auto; border-radius: 22px; padding: 0 16px; font: italic 14px Georgia, serif; }
+#mandos > #mas { width: auto; border-radius: 22px; padding: 0 16px; font: italic 14px Georgia, serif; }
 #mandos > #grabar { width: 66px; height: 66px; display: grid; place-items: center; }
 #grabar span { width: 46px; height: 46px; border-radius: 50%; background: rgb(180, 20, 20); transition: all .25s; }
 #grabar.activo span { width: 22px; height: 22px; border-radius: 2px; }
@@ -44,3 +44,8 @@ button { font: 11px/1.5 sans-serif; color: #333; background: #fff; border: 1px s
 #revisar video { max-width: 100%; max-height: 74vh; border: 1px solid #ddd; }
 #revisar .botones { display: flex; gap: 10px; }
 #nota { min-height: 1.6em; font: italic 12px/1.8 Georgia, serif; color: #555; }
+#pr { cursor: default; }
+#pr .grande { display: block; margin: 14px auto 6px; font: 13px/1.6 Georgia, serif; padding: 6px 16px; background: #333; color: #fff; border: none; }
+#pr .otra { display: block; margin: 0 auto; font: italic 11px/1.6 Georgia, serif; color: #888; border: none; background: none; text-decoration: underline; }
+#cfgP label { display: block; margin: 6px 0 2px; font-size: 9px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+#cfgP input[type=range] { width: 100%; accent-color: #333; }
