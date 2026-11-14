@@ -1,0 +1,19 @@
+[hidden] { display: none !important; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; background: #000; overflow: hidden; }
+#lienzo { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); display: block; cursor: crosshair; }
+#ov { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #fff; z-index: 5; }
+#pr { color: #333; font: 15px/2 Georgia, serif; text-align: center; padding: 34px 48px; border: 1px solid #ddd; max-width: 520px; }
+#pr .informe { font: italic 11px/1.8 Georgia, serif; color: #999; margin-bottom: 10px; }
+#pr span { display: block; font: italic 12px/1.6 Georgia, serif; color: #777; }
+#pr .grande { display: block; margin: 18px auto 12px; font: 13px/1.6 Georgia, serif; padding: 7px 22px; background: #333; color: #fff; border: none; cursor: pointer; }
+#pr .n { font: 11px/1.6 Georgia, serif; color: #888; }
+#estado { font: 10px/1.6 'Courier New', monospace; color: #a33; margin-top: 10px; min-height: 1.6em; }
+#hud { position: fixed; right: 10px; bottom: 8px; font: 10px 'Courier New', monospace; color: rgba(255,255,255,.55); z-index: 3; pointer-events: none; }
+#ayuda { position: fixed; left: 10px; bottom: 8px; font: 10px/1.5 'Courier New', monospace; color: rgba(255,255,255,.55); z-index: 3; pointer-events: none; }
+#aviso { position: fixed; left: 50%; top: 18px; transform: translateX(-50%); font: italic 14px/1.6 Georgia, serif; color: rgba(255,255,255,.85); text-shadow: 0 0 6px #000; z-index: 3; pointer-events: none; }
+#reproductor { position: fixed; left: 10px; right: 10px; bottom: 44px; z-index: 4; display: flex; gap: 10px; align-items: center; transition: opacity .4s; }
+#reproductor.apagado { opacity: .25; }
+#barra { flex: 1; height: 8px; background: rgba(255,255,255,.18); cursor: pointer; }
+#barra-dentro { height: 100%; background: rgba(255,255,255,.7); width: 0; }
+#t { font: 11px 'Courier New', monospace; color: rgba(255,255,255,.7); min-width: 110px; }
