@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#ffffff">
+<title>La cámara que escribe</title>
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+<video id="video" playsinline muted></video>
+<canvas id="lienzo"></canvas>
+
+<div id="ov"><div id="pr">
+<div class="informe">informe de lectura — todo lo que miras se vuelve frase</div>
+la cámara que escribe
+<label class="campo">tu clave de la API de Anthropic
+<input id="clave" type="password" autocomplete="off" placeholder="sk-ant-…"></label>
+<button id="pegar" class="otra">pegar la clave copiada</button>
+<div class="n">se guarda solo en este móvil; cada frase cuesta una fracción de céntimo</div>
+<button id="empezar" class="grande">abrir el ojo</button>
+<p id="estado"></p>
+<div id="version"></div>
+</div></div>
+
+<div id="aviso" hidden></div>
+<pre id="st" hidden></pre>
+<div id="tiempo" hidden>0:00</div>
+
+<nav id="mandos" hidden>
+  <button id="girar" aria-label="cambiar de cámara">⇄</button>
+  <button id="grabar" aria-label="grabar"><span></span></button>
+  <button id="ajustes-boton" aria-label="ajustes">⚙</button>
+</nav>
+
+<div id="cfgP" hidden>
+  <label>tono</label>
+  <select id="tono"><option value="preciso">preciso</option><option value="poetico">poético</option><option value="delirante">delirante</option></select>
+  <label>voz (opcional)</label>
+  <input id="voz" type="text" placeholder="al modo de Bruno Schulz">
+  <div class="n">cómo escribe: un autor, un tiempo verbal, una persona, una obsesión</div>
+  <label>escritura</label>
+  <select id="modelo"><option value="rapido">rápida (Haiku)</option><option value="bueno">mejor escrita (Sonnet, más lenta)</option></select>
+  <label class="fila"><input id="micro" type="checkbox"> grabar sonido</label>
+  <label class="fila"><input id="ver" type="checkbox"> mostrar datos</label>
+  <button id="olvidar">borrar la clave de este móvil</button>
+</div>
+
+<div id="revisar" hidden>
+  <video controls playsinline loop></video>
+  <div class="botones"><button id="descartar">descartar</button><button id="guardar" class="sv">guardar</button></div>
+  <p id="nota"></p>
+</div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
