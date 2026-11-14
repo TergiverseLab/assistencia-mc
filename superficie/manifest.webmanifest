@@ -1,0 +1,11 @@
+{
+  "name": "Caligrama · el ojo que lee mal",
+  "short_name": "Caligrama",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [{ "src": "icono.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }, { "src": "icono-512.png", "sizes": "512x512", "type": "image/png" }]
+}

@@ -1,0 +1,58 @@
+/* estilo.css — la piel del bosque caligramático: papel blanco, Georgia para lo que se dice, Courier para lo
+   que se escribe, botones blancos de borde gris fino, el rojo solo para la infección y la grabación. */
+@font-face { font-family: 'Courier Prime'; font-weight: 400; font-style: normal; src: url('vendor/courier-prime-latin-400-normal.woff2') format('woff2'); font-display: block; }
+@font-face { font-family: 'Courier Prime'; font-weight: 700; font-style: normal; src: url('vendor/courier-prime-latin-700-normal.woff2') format('woff2'); font-display: block; }
+@font-face { font-family: 'Courier Prime'; font-weight: 400; font-style: italic; src: url('vendor/courier-prime-latin-400-italic.woff2') format('woff2'); font-display: block; }
+@font-face { font-family: 'Courier Prime'; font-weight: 700; font-style: italic; src: url('vendor/courier-prime-latin-700-italic.woff2') format('woff2'); font-display: block; }
+[hidden] { display: none !important; }
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; overflow: hidden; background: #fff; touch-action: manipulation; }
+body[data-modo="interior"] { background: #000; }
+#video { position: fixed; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+#lienzo { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; height: 100dvh; display: block; }
+button { font: 11px/1.5 sans-serif; color: #333; background: #fff; border: 1px solid #ccc; padding: 3px 8px; cursor: pointer; }
+
+/* portada: la caja del bosque */
+#ov { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 20; background: #fff; }
+#pr { color: #333; font: 14px/2 Georgia, serif; text-align: center; cursor: pointer; padding: 30px 50px; border: 1px solid #ddd; background: #fff; max-width: 88vw; }
+#pr .informe { font: italic 11px/1.8 Georgia, serif; color: #999; margin-bottom: 12px; }
+#pr span { display: block; font: 11px/1.8 Georgia, serif; color: #666; margin-top: 8px; }
+#estado { font: 10px/1.6 "Courier New", "Courier Prime", monospace; color: #aaa; margin-top: 6px; min-height: 1.6em; max-width: 30ch; margin-inline: auto; }
+
+/* estado, abajo a la derecha, como #st del bosque */
+#st { position: fixed; bottom: calc(96px + env(safe-area-inset-bottom)); right: 8px; z-index: 10; pointer-events: none; font: 9px/1.4 monospace; color: #999;
+  background: rgba(255, 255, 255, .85); padding: 2px 6px; white-space: pre; text-align: right; }
+
+/* la grabación: el contador como #corr del bosque, el rojo como su span */
+#tiempo { position: fixed; top: max(8px, env(safe-area-inset-top)); left: 8px; z-index: 42; font: 10px/1.4 'Courier New', 'Courier Prime', monospace; color: #c00; font-weight: bold;
+  background: rgba(255, 255, 255, .9); padding: 3px 10px; border: 1px solid #ddd; border-radius: 2px; }
+#tiempo::before { content: '● '; }
+
+#mandos { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; display: flex; justify-content: space-around; align-items: center;
+  padding: 12px 18px max(16px, env(safe-area-inset-bottom)); pointer-events: none; }
+#mandos > button { pointer-events: auto; width: 44px; height: 44px; padding: 0; font-size: 18px; border-radius: 50%; background: rgba(255, 255, 255, .9); }
+#mandos > #grabar { width: 66px; height: 66px; display: grid; place-items: center; border: 1px solid #ccc; background: rgba(255, 255, 255, .9); }
+#grabar span { width: 46px; height: 46px; border-radius: 50%; background: rgb(180, 20, 20); transition: all .25s; }
+#grabar.activo span { width: 22px; height: 22px; border-radius: 2px; }
+
+/* ajustes: el panel #cfgP del bosque */
+#cfgP { position: fixed; left: 8px; right: 8px; bottom: calc(92px + env(safe-area-inset-bottom)); z-index: 31; background: #fff; border: 1px solid #ccc; padding: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .1); font: 11px/1.5 sans-serif; color: #333; max-width: 360px; margin-left: auto; }
+#cfgP label { display: block; margin: 6px 0 2px; font-size: 9px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+#cfgP label.fila { display: flex; align-items: center; gap: 8px; margin: 10px 0 2px; }
+#cfgP input[type=range] { width: 100%; accent-color: #333; }
+#cfgP input[type=checkbox] { width: 16px; height: 16px; accent-color: #333; }
+#cfgP .n { font-size: 8px; color: #aaa; margin: 1px 0 6px; }
+.sv { margin-top: 10px; background: #333; color: #fff; border: none; padding: 5px 14px; }
+
+#revisar { position: fixed; inset: 0; z-index: 50; background: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 12px;
+  padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom)); }
+#revisar video { max-width: 100%; max-height: 74vh; border: 1px solid #ddd; background: #fff; }
+#revisar .botones { display: flex; gap: 10px; align-items: center; }
+#revisar .botones .sv { margin-top: 0; }
+#nota { min-height: 1.6em; font: italic 12px/1.8 Georgia, serif; color: #555; }
+#cfgP select { width: 100%; padding: 4px 6px; border: 1px solid #ddd; font: 11px sans-serif; background: #fff; color: #333; }
+/* mientras el ojo se carga: el aviso, como los mensajes del bosque */
+#aviso { position: fixed; top: max(14px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); z-index: 42; pointer-events: none;
+  font: italic 12px/1.6 Georgia, serif; color: #555; background: rgba(255, 255, 255, .9); padding: 2px 10px; max-width: 86vw; text-align: center; }
+#version { font: 9px monospace; color: #bbb; margin-top: 4px; }
