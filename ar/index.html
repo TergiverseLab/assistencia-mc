@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#ffffff">
+<title>Palabras sobre las cosas</title>
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+<div id="ov"><div id="pr">
+<div class="informe">informe de anomalía textual — las palabras se posan sobre las cosas</div>
+palabras sobre las cosas
+<button id="entrar" class="grande">entrar</button>
+<label class="fila"><input id="nombres" type="checkbox" checked> nombrar las cosas (descarga 19 MB la primera vez)</label>
+<div class="n">realidad aumentada: hace falta Chrome en Android con «Servicios de Google Play para RA». Para grabar, usa la grabación de pantalla del móvil.</div>
+<p id="estado"></p>
+<div id="version"></div>
+</div></div>
+
+<div id="capa">
+  <div id="aviso" hidden></div>
+  <div id="aviso2"></div>
+  <pre id="st" hidden></pre>
+  <nav id="mandos" hidden>
+    <button id="salir">salir</button>
+    <button id="ajustes-boton" aria-label="ajustes">⚙</button>
+  </nav>
+  <div id="cfgP" hidden>
+    <label>tamaño de las letras: <span id="letra-n">3</span> cm</label><input id="letra" type="range" min="1" max="15" step="0.5" value="3">
+    <div class="n">tamaño real sobre las cosas: al acercarte, crecen</div>
+    <label class="fila"><input id="papel" type="checkbox" checked> papel (si no, letras sobre la cámara)</label>
+    <label class="fila"><input id="volteo" type="checkbox"> voltear la cámara (si la luz sale al revés)</label>
+    <label class="fila"><input id="ver" type="checkbox"> mostrar datos</label>
+  </div>
+</div>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
